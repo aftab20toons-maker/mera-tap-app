@@ -3,55 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tap Fast</title>
+    <title>Tap Fast - Secure Verification</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body { background: #0b0b0b; color: white; font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; overflow: hidden; user-select: none; }
         .header { padding: 15px; font-size: 1.3rem; color: #00ffcc; font-weight: bold; text-shadow: 0 0 10px #00ffcc; }
         .score-box { font-size: 3.5rem; margin: 10px; color: #fff; text-shadow: 0 0 15px #ff00ff; }
-        #main-coin { width: 220px; cursor: pointer; transition: transform 0.1s; filter: drop-shadow(0 0 20px #00ffcc); -webkit-tap-highlight-color: transparent; margin-top: 10px; }
+        #main-coin { width: 180px; cursor: pointer; transition: 0.1s; filter: drop-shadow(0 0 15px #00ffcc); -webkit-tap-highlight-color: transparent; }
         #main-coin:active { transform: scale(0.9); }
         
-        .plus-one { position: absolute; color: #00ffcc; font-weight: bold; font-size: 1.5rem; animation: floatUp 0.6s ease-out forwards; pointer-events: none; }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-120px); } }
-
-        .btn { display: none; margin: 20px auto; padding: 15px 30px; border-radius: 15px; border: none; font-weight: bold; font-size: 1.2rem; cursor: pointer; width: 85%; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.4); }
+        .btn { display: none; margin: 15px auto; padding: 15px; border-radius: 12px; border: none; font-weight: bold; width: 85%; cursor: pointer; font-size: 1.1rem; }
         #earn-more-btn { background: linear-gradient(45deg, #00b09b, #96c93d); color: white; display: block; }
         #withdraw-btn { background: linear-gradient(45deg, #f857a6, #ff5858); color: white; }
         
-        #ad-loader { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; }
+        /* Verification Loader Overlay */
+        #ad-loader { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; }
         .spinner { border: 5px solid #333; border-top: 5px solid #00ffcc; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        #withdraw-page { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0b0b; z-index: 100; padding-top: 50px; }
-        input { padding: 15px; width: 80%; border-radius: 12px; border: 1px solid #00ffcc; background: #1a1a1a; color: white; margin: 15px 0; font-size: 1rem; }
+        .loader-msg { color: #00ffcc; font-weight: bold; margin-top: 20px; font-size: 1.2rem; }
+        .warning { color: #ff5858; font-size: 0.8rem; margin-top: 10px; padding: 0 20px; }
     </style>
 </head>
 <body>
 
     <div id="ad-loader">
         <div class="spinner"></div>
-        <p id="loader-text" style="margin-top: 20px; font-size: 1.1rem;">Verifying Reward... 5s</p>
+        <p class="loader-msg" id="loader-text">Checking Ad View... 10s</p>
+        <p class="warning">Please wait! Our system is verifying your reward...</p>
     </div>
 
     <div id="game-page">
         <div class="header">TAP FAST ⚡</div>
-        <div style="color:#aaa;">Player: <span id="user-name">Guest</span></div>
+        <div style="color:#aaa;">User: <span id="user-name">Guest</span></div>
         <div class="score-box"><span id="score">0</span></div>
         <div style="color:#ff00ff; margin-bottom: 10px;">Taps Left: <span id="taps-left">10</span>/10</div>
 
-        <img src="https://cdn-icons-png.flaticon.com/512/5968/5968330.png" id="main-coin" alt="coin">
+        <img src="https://cdn-icons-png.flaticon.com/512/5968/5968330.png" id="main-coin">
 
-        <button id="earn-more-btn" class="btn" onclick="openAdLink()">Earn More +10 Points 💰</button>
-        <button id="withdraw-btn" class="btn" onclick="openWithdraw()">Withdraw Points</button>
-    </div>
-
-    <div id="withdraw-page">
-        <h2 style="color: #f857a6;">Cash Out</h2>
-        <p>Your Balance: <span id="final-points">0</span> Points</p>
-        <input type="text" id="upi-id" placeholder="Enter UPI ID (e.g. name@upi)">
-        <button class="btn" style="display:block; background:#00b09b;" onclick="alert('Success: Request sent to Admin!')">Submit Request</button>
-        <p onclick="closeWithdraw()" style="color:#666; cursor:pointer; margin-top:30px;">← Back to Game</p>
+        <button id="earn-more-btn" class="btn" onclick="startAdProcess()">💰 Get +10 Points & Recharge</button>
+        <button id="withdraw-btn" class="btn" onclick="alert('Min. Withdraw: 5000 Pts')">Withdraw Points</button>
     </div>
 
     <script>
@@ -59,75 +49,76 @@
         tele.expand();
         document.getElementById('user-name').innerText = tele.initDataUnsafe.user?.first_name || "Guest";
 
-        let score = 0;
-        let tapsLeft = 10;
-        let adsToday = 0;
-
-        // TERA ADSTERRA LINK
+        // TERA ADSTERRA SMARTLINK
         const myAdLink = "https://www.effectivegatecpm.com/h2k3bt3ugx?key=61b8801b9434839364f72a682179f2d0"; 
 
-        const mainCoin = document.getElementById('main-coin');
+        // Local Storage
+        let score = parseInt(localStorage.getItem('user_score')) || 0;
+        let tapsLeft = localStorage.getItem('user_taps') !== null ? parseInt(localStorage.getItem('user_taps')) : 10;
+
         const scoreDisplay = document.getElementById('score');
         const tapsDisplay = document.getElementById('taps-left');
+        const mainCoin = document.getElementById('main-coin');
 
-        mainCoin.addEventListener('click', (e) => {
+        function updateUI() {
+            scoreDisplay.innerText = score;
+            tapsDisplay.innerText = tapsLeft;
+            localStorage.setItem('user_score', score);
+            localStorage.setItem('user_taps', tapsLeft);
+
+            if (tapsLeft === 0) {
+                mainCoin.style.display = 'none';
+                document.getElementById('earn-more-btn').style.display = 'block';
+            } else {
+                mainCoin.style.display = 'inline-block';
+                document.getElementById('earn-more-btn').style.display = 'none';
+            }
+        }
+
+        mainCoin.addEventListener('click', () => {
             if (tapsLeft > 0) {
                 score++;
                 tapsLeft--;
-                showPlusOne(e.clientX, e.clientY);
                 updateUI();
-            }
-            if (tapsLeft === 0) {
-                mainCoin.style.display = 'none';
-                document.getElementById('withdraw-btn').style.display = 'block';
             }
         });
 
-        function showPlusOne(x, y) {
-            const el = document.createElement('div');
-            el.innerText = "+1";
-            el.className = 'plus-one';
-            el.style.left = x + 'px';
-            el.style.top = y + 'px';
-            document.body.appendChild(el);
-            setTimeout(() => el.remove(), 600);
+        function startAdProcess() {
+            // Step 1: Ad Open Karo
+            window.open(myAdLink, '_blank');
+
+            // Step 2: 5 second baad Notification do ki "Wapas aao"
+            setTimeout(() => {
+                alert("Ads viewed! Ab wapas bot par aao verification ke liye.");
+                startVerification(); // Verification timer shuru
+            }, 5000);
         }
 
-        function openAdLink() {
-            if (adsToday >= 10) {
-                alert("Limit reached for now!");
-                return;
-            }
-
-            window.open(myAdLink, '_blank');
+        function startVerification() {
             const loader = document.getElementById('ad-loader');
             loader.style.display = 'flex';
             
-            let timeLeft = 5;
+            let timeLeft = 10; // 10 Second Ka Verification
             const timerInterval = setInterval(() => {
                 timeLeft--;
-                document.getElementById('loader-text').innerText = `Verifying Reward... ${timeLeft}s`;
+                document.getElementById('loader-text').innerText = `Checking Ad View... ${timeLeft}s`;
                 
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
                     loader.style.display = 'none';
+                    
+                    // Reward Update
                     score += 10;
-                    adsToday++;
+                    tapsLeft = 10; 
                     updateUI();
-                    alert("Shabash! +10 Points mil gaye.");
-                    document.getElementById('loader-text').innerText = `Verifying Reward... 5s`;
+                    
+                    alert("✅ Verification Successful! +10 Points added.");
+                    document.getElementById('loader-text').innerText = `Checking Ad View... 10s`;
                 }
             }, 1000);
         }
 
-        function updateUI() {
-            scoreDisplay.innerText = score;
-            document.getElementById('final-points').innerText = score;
-            tapsDisplay.innerText = tapsLeft;
-        }
-
-        function openWithdraw() { document.getElementById('withdraw-page').style.display = 'block'; }
-        function closeWithdraw() { document.getElementById('withdraw-page').style.display = 'none'; }
+        updateUI();
     </script>
 </body>
 </html>
