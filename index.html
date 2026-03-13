@@ -1,45 +1,115 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Tapsterra Hourly Loot</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tapsterra Pro</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { background: #121212; color: gold; text-align: center; font-family: sans-serif; margin: 0; padding: 20px; overflow: hidden; }
-        .circle { width: 220px; height: 220px; background: radial-gradient(circle, #ffd700, #b8860b); border-radius: 50%; margin: 50px auto; display: flex; align-items: center; justify-content: center; font-size: 50px; cursor: pointer; color: black; font-weight: bold; box-shadow: 0 0 30px rgba(255, 215, 0, 0.5); user-select: none; transition: transform 0.1s; }
-        .circle:active { transform: scale(0.9); }
-        .stats { font-size: 28px; margin-bottom: 10px; font-weight: bold; }
-        #timer { color: #ff4444; font-size: 22px; margin-top: 20px; display: none; background: rgba(255,0,0,0.1); padding: 10px; border-radius: 10px; }
+        body { background: #1a1a1a; color: white; font-family: 'Arial', sans-serif; text-align: center; margin: 0; overflow: hidden; }
+        .header { padding: 20px; font-size: 1.2rem; color: #ff9800; }
+        #coin-container { position: relative; margin-top: 50px; display: inline-block; }
+        #main-coin { width: 200px; cursor: pointer; transition: transform 0.1s; -webkit-tap-highlight-color: transparent; }
+        #main-coin:active { transform: scale(0.95); }
+        .score-box { font-size: 2.5rem; margin: 20px; font-weight: bold; }
+        .tap-limit { color: #aaa; font-size: 0.9rem; }
+        
+        /* Floating +1 Animation */
+        .plus-one { position: absolute; color: #00ff00; font-weight: bold; animation: floatUp 0.8s ease-out forwards; pointer-events: none; }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-100px); } }
+
+        /* Buttons */
+        .btn { display: none; margin: 20px auto; padding: 15px 30px; border-radius: 50px; border: none; font-weight: bold; font-size: 1rem; cursor: pointer; width: 80%; }
+        #withdraw-btn { background: #ff9800; color: white; display: none; }
+        #earn-more-btn { background: #4caf50; color: white; display: block; margin-bottom: 10px; }
+        
+        /* Withdrawal Page */
+        #withdraw-page { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a1a1a; z-index: 100; padding-top: 50px; }
+        input { padding: 12px; width: 80%; border-radius: 8px; border: none; margin: 10px 0; }
+        .back-btn { background: #555; color: white; padding: 10px; border-radius: 5px; cursor: pointer; display: inline-block; margin-top: 20px; }
     </style>
 </head>
 <body>
-    <h1>Tapsterra Loot</h1>
-    <div class="stats">Taps Left: <span id="tapCount">100</span></div>
-    <div id="timer">Come back in 1 Hour!</div>
-    <div class="circle" id="tapBtn">TAP!</div>
+
+    <div id="game-page">
+        <div class="header">Welcome, <span id="user-name">Player</span>!</div>
+        <div class="score-box">Points: <span id="score">0</span></div>
+        <div class="tap-limit">Taps Left: <span id="taps-left">10</span>/10</div>
+
+        <div id="coin-container">
+            <img src="https://cdn-icons-png.flaticon.com/512/5968/5968330.png" id="main-coin" alt="coin">
+        </div>
+
+        <button id="earn-more-btn" class="btn" onclick="showAd()">Earn More (Ads) +10 💰</button>
+        <button id="withdraw-btn" class="btn" onclick="openWithdraw()">Withdraw Now (1 RS)</button>
+    </div>
+
+    <div id="withdraw-page">
+        <h2>Withdrawal</h2>
+        <p>Minimum: 1 RS (1000 Points)</p>
+        <input type="text" placeholder="Enter UPI ID (e.g. name@paytm)">
+        <button class="btn" style="display:block; background:#4caf50;" onclick="alert('Request Sent!')">Submit Withdrawal</button>
+        <div class="back-btn" onclick="closeWithdraw()">← Back to Game</div>
+    </div>
 
     <script>
-        let taps = 100;
-        const btn = document.getElementById('tapBtn');
-        const countDisplay = document.getElementById('tapCount');
-        const timerDisplay = document.getElementById('timer');
+        let tele = window.Telegram.WebApp;
+        tele.expand();
+        document.getElementById('user-name').innerText = tele.initDataUnsafe.user?.first_name || "Player";
 
-        // Telegram WebApp initialize
-        const tg = window.Telegram.WebApp;
-        tg.expand(); // Full screen karne ke liye
+        let score = 0;
+        let tapsLeft = 10;
+        let adsCount = 0;
 
-        btn.addEventListener('click', () => {
-            if(taps > 0) {
-                taps--;
-                countDisplay.innerText = taps;
-                // Haptic feedback (vibration) agar mobile pe hai
-                if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+        const mainCoin = document.getElementById('main-coin');
+        const scoreDisplay = document.getElementById('score');
+        const tapsDisplay = document.getElementById('taps-left');
+        const withdrawBtn = document.getElementById('withdraw-btn');
 
-                if(taps === 0) {
-                    btn.style.display = 'none';
-                    timerDisplay.style.display = 'block';
-                }
+        // Tap Logic
+        mainCoin.addEventListener('click', (e) => {
+            if (tapsLeft > 0) {
+                score++;
+                tapsLeft--;
+                updateUI();
+                showPlusOne(e.clientX, e.clientY);
+            }
+            if (tapsLeft === 0) {
+                mainCoin.style.display = 'none';
+                withdrawBtn.style.display = 'block';
             }
         });
+
+        function updateUI() {
+            scoreDisplay.innerText = score;
+            tapsDisplay.innerText = tapsLeft;
+        }
+
+        function showPlusOne(x, y) {
+            const el = document.createElement('div');
+            el.innerText = "+1";
+            el.className = 'plus-one';
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 800);
+        }
+
+        function showAd() {
+            if (adsCount < 3) {
+                // YAHAN APNA ADSTERRA DIRECT LINK DALO
+                window.open('https://your-adsterra-link.com', '_blank');
+                score += 10;
+                adsCount++;
+                updateUI();
+                alert("You got 10 bonus points!");
+            } else {
+                alert("1 hour limit reached for ads!");
+            }
+        }
+
+        function openWithdraw() { document.getElementById('withdraw-page').style.display = 'block'; }
+        function closeWithdraw() { document.getElementById('withdraw-page').style.display = 'none'; }
     </script>
 </body>
 </html>
