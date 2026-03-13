@@ -6,67 +6,65 @@
     <title>Tap Fast</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { background: #121212; color: white; font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; overflow: hidden; user-select: none; }
-        .header { padding: 15px; font-size: 1.1rem; color: #00d2ff; font-weight: bold; }
-        .score-box { font-size: 3rem; margin: 10px; color: #fff; text-shadow: 0 0 10px #00d2ff; }
-        #main-coin { width: 220px; cursor: pointer; transition: transform 0.1s; filter: drop-shadow(0 0 15px #00d2ff); -webkit-tap-highlight-color: transparent; }
+        body { background: #0b0b0b; color: white; font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; overflow: hidden; user-select: none; }
+        .header { padding: 15px; font-size: 1.3rem; color: #00ffcc; font-weight: bold; text-shadow: 0 0 10px #00ffcc; }
+        .score-box { font-size: 3.5rem; margin: 10px; color: #fff; text-shadow: 0 0 15px #ff00ff; }
+        #main-coin { width: 220px; cursor: pointer; transition: transform 0.1s; filter: drop-shadow(0 0 20px #00ffcc); -webkit-tap-highlight-color: transparent; margin-top: 10px; }
         #main-coin:active { transform: scale(0.9); }
         
-        /* Floating +1 */
         .plus-one { position: absolute; color: #00ffcc; font-weight: bold; font-size: 1.5rem; animation: floatUp 0.6s ease-out forwards; pointer-events: none; }
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-120px); } }
 
-        /* Buttons */
-        .btn { display: none; margin: 15px auto; padding: 15px 30px; border-radius: 12px; border: none; font-weight: bold; font-size: 1.1rem; cursor: pointer; width: 85%; transition: 0.3s; }
-        #earn-more-btn { background: linear-gradient(45deg, #4caf50, #81c784); color: white; display: block; }
-        #withdraw-btn { background: linear-gradient(45deg, #ff9800, #ffb74d); color: white; }
+        .btn { display: none; margin: 20px auto; padding: 15px 30px; border-radius: 15px; border: none; font-weight: bold; font-size: 1.2rem; cursor: pointer; width: 85%; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.4); }
+        #earn-more-btn { background: linear-gradient(45deg, #00b09b, #96c93d); color: white; display: block; }
+        #withdraw-btn { background: linear-gradient(45deg, #f857a6, #ff5858); color: white; }
         
-        /* Ad Timer Overlay */
-        #ad-loader { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; }
-        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #00d2ff; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        #ad-loader { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; }
+        .spinner { border: 5px solid #333; border-top: 5px solid #00ffcc; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Withdraw Page */
-        #withdraw-page { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 100; padding-top: 40px; }
-        input { padding: 15px; width: 80%; border-radius: 10px; border: 1px solid #333; background: #222; color: white; margin: 10px 0; }
+        #withdraw-page { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0b0b; z-index: 100; padding-top: 50px; }
+        input { padding: 15px; width: 80%; border-radius: 12px; border: 1px solid #00ffcc; background: #1a1a1a; color: white; margin: 15px 0; font-size: 1rem; }
     </style>
 </head>
 <body>
 
     <div id="ad-loader">
         <div class="spinner"></div>
-        <p id="loader-text">Verifying Ad View...</p>
+        <p id="loader-text" style="margin-top: 20px; font-size: 1.1rem;">Verifying Reward... 5s</p>
     </div>
 
     <div id="game-page">
-        <div class="header">TAP FAST: <span id="user-name">Player</span></div>
+        <div class="header">TAP FAST ⚡</div>
+        <div style="color:#aaa;">Player: <span id="user-name">Guest</span></div>
         <div class="score-box"><span id="score">0</span></div>
-        <div style="color:#888; margin-bottom: 20px;">Taps Left: <span id="taps-left">10</span>/10</div>
+        <div style="color:#ff00ff; margin-bottom: 10px;">Taps Left: <span id="taps-left">10</span>/10</div>
 
-        <div id="coin-area">
-            <img src="https://cdn-icons-png.flaticon.com/512/5968/5968330.png" id="main-coin" alt="coin">
-        </div>
+        <img src="https://cdn-icons-png.flaticon.com/512/5968/5968330.png" id="main-coin" alt="coin">
 
-        <button id="earn-more-btn" class="btn" onclick="startAdProcess()">Earn More (Ads) +10 💰</button>
-        <button id="withdraw-btn" class="btn" onclick="openWithdraw()">Withdraw (Min 1 RS)</button>
+        <button id="earn-more-btn" class="btn" onclick="openAdLink()">Earn More +10 Points 💰</button>
+        <button id="withdraw-btn" class="btn" onclick="openWithdraw()">Withdraw Points</button>
     </div>
 
     <div id="withdraw-page">
-        <h2>Withdraw Funds</h2>
-        <p style="color: #4caf50;">Minimum Withdrawal: 1 RS</p>
-        <input type="text" id="upi-id" placeholder="Enter UPI ID (e.g. user@apl)">
-        <button class="btn" style="display:block; background:#4caf50;" onclick="alert('Withdrawal request submitted!')">Submit Request</button>
-        <p onclick="closeWithdraw()" style="color:#aaa; cursor:pointer; margin-top:20px;">← Back to Tap Fast</p>
+        <h2 style="color: #f857a6;">Cash Out</h2>
+        <p>Your Balance: <span id="final-points">0</span> Points</p>
+        <input type="text" id="upi-id" placeholder="Enter UPI ID (e.g. name@upi)">
+        <button class="btn" style="display:block; background:#00b09b;" onclick="alert('Success: Request sent to Admin!')">Submit Request</button>
+        <p onclick="closeWithdraw()" style="color:#666; cursor:pointer; margin-top:30px;">← Back to Game</p>
     </div>
 
     <script>
         let tele = window.Telegram.WebApp;
         tele.expand();
-        document.getElementById('user-name').innerText = tele.initDataUnsafe.user?.first_name || "Player";
+        document.getElementById('user-name').innerText = tele.initDataUnsafe.user?.first_name || "Guest";
 
         let score = 0;
         let tapsLeft = 10;
         let adsToday = 0;
+
+        // TERA ADSTERRA LINK
+        const myAdLink = "https://www.effectivegatecpm.com/h2k3bt3ugx?key=61b8801b9434839364f72a682179f2d0"; 
 
         const mainCoin = document.getElementById('main-coin');
         const scoreDisplay = document.getElementById('score');
@@ -95,23 +93,20 @@
             setTimeout(() => el.remove(), 600);
         }
 
-        function startAdProcess() {
-            if (adsToday >= 3) {
-                alert("Hourly limit reached!");
+        function openAdLink() {
+            if (adsToday >= 10) {
+                alert("Limit reached for now!");
                 return;
             }
 
-            // 1. Ad Open Karo (Replace with your Adsterra Direct Link)
-            window.open('https://www.google.com', '_blank'); 
-
-            // 2. Loader Dikhao
+            window.open(myAdLink, '_blank');
             const loader = document.getElementById('ad-loader');
             loader.style.display = 'flex';
             
             let timeLeft = 5;
             const timerInterval = setInterval(() => {
                 timeLeft--;
-                document.getElementById('loader-text').innerText = `Verifying... ${timeLeft}s`;
+                document.getElementById('loader-text').innerText = `Verifying Reward... ${timeLeft}s`;
                 
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
@@ -119,14 +114,15 @@
                     score += 10;
                     adsToday++;
                     updateUI();
-                    alert("Verification Complete! +10 Points added.");
-                    document.getElementById('loader-text').innerText = `Verifying Ad View...`;
+                    alert("Shabash! +10 Points mil gaye.");
+                    document.getElementById('loader-text').innerText = `Verifying Reward... 5s`;
                 }
             }, 1000);
         }
 
         function updateUI() {
             scoreDisplay.innerText = score;
+            document.getElementById('final-points').innerText = score;
             tapsDisplay.innerText = tapsLeft;
         }
 
