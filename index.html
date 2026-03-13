@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tapsterra Hourly Loot</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body { background: #121212; color: gold; text-align: center; font-family: sans-serif; margin: 0; padding: 20px; overflow: hidden; }
+        .circle { width: 220px; height: 220px; background: radial-gradient(circle, #ffd700, #b8860b); border-radius: 50%; margin: 50px auto; display: flex; align-items: center; justify-content: center; font-size: 50px; cursor: pointer; color: black; font-weight: bold; box-shadow: 0 0 30px rgba(255, 215, 0, 0.5); user-select: none; transition: transform 0.1s; }
+        .circle:active { transform: scale(0.9); }
+        .stats { font-size: 28px; margin-bottom: 10px; font-weight: bold; }
+        #timer { color: #ff4444; font-size: 22px; margin-top: 20px; display: none; background: rgba(255,0,0,0.1); padding: 10px; border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Tapsterra Loot</h1>
+    <div class="stats">Taps Left: <span id="tapCount">100</span></div>
+    <div id="timer">Come back in 1 Hour!</div>
+    <div class="circle" id="tapBtn">TAP!</div>
+
+    <script>
+        let taps = 100;
+        const btn = document.getElementById('tapBtn');
+        const countDisplay = document.getElementById('tapCount');
+        const timerDisplay = document.getElementById('timer');
+
+        // Telegram WebApp initialize
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Full screen karne ke liye
+
+        btn.addEventListener('click', () => {
+            if(taps > 0) {
+                taps--;
+                countDisplay.innerText = taps;
+                // Haptic feedback (vibration) agar mobile pe hai
+                if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+
+                if(taps === 0) {
+                    btn.style.display = 'none';
+                    timerDisplay.style.display = 'block';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
