@@ -18,7 +18,7 @@
         .upgrade-wrapper { display: flex; justify-content: space-between; width: 90%; gap: 10px; margin-bottom: 10px; }
         .main-up-btn { background: #1a1a1a; color: #00ffcc; border: 1px solid #333; border-radius: 8px; padding: 10px; flex: 1; cursor: pointer; font-size: 10px; font-weight: bold; text-transform: uppercase; }
 
-        /* Wallet Center */
+        /* Wallet Section */
         .wallet-container { 
             background: rgba(255, 255, 255, 0.03); 
             border: 1px dashed #444; 
@@ -27,33 +27,52 @@
             align-items: center; 
             padding: 10px 25px; 
             margin: 15px auto; 
-            justify-content: center;
         }
         .wallet-info { text-align: center; margin-left: 10px; }
         .wallet-label { font-size: 10px; color: #aaa; display: block; }
         .wallet-coins { font-size: 26px; font-weight: bold; color: white; }
         .wallet-rs { font-size: 14px; color: #00ffcc; font-weight: bold; margin-left: 10px; }
 
-        /* Main Coin (Marked Section Fix) */
-        .coin-wrapper { margin-top: 20px; display: flex; justify-content: center; width: 100%; position: relative; }
-        #main-tap-coin { 
-            width: 220px; 
-            cursor: pointer; 
-            transition: transform 0.1s; 
-            filter: drop-shadow(0 0 30px rgba(255, 204, 0, 0.5)); 
+        /* --- ASLI 3D COIN CSS --- */
+        .coin-wrapper { margin-top: 40px; display: flex; justify-content: center; width: 100%; position: relative; perspective: 1000px; }
+        
+        #main-tap-coin {
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, #ffe066 0%, #ffcc00 50%, #b38f00 100%);
+            border-radius: 50%;
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            font-weight: bold;
+            color: rgba(0,0,0,0.2);
+            box-shadow: 0 0 40px rgba(255, 204, 0, 0.6), inset 0 0 20px rgba(255,255,255,0.5);
+            border: 8px solid #cca300;
+            transition: transform 0.1s;
         }
-        #main-tap-coin:active { transform: scale(0.90); }
+
+        /* Coin ke andar ka symbol */
+        #main-tap-coin::before {
+            content: "C"; /* Coin symbol */
+            color: #b38f00;
+            text-shadow: 2px 2px 4px rgba(255,255,255,0.3);
+        }
+
+        #main-tap-coin:active { transform: scale(0.92) rotateX(10deg); }
         
         /* Animation */
-        .plus-one { position: absolute; color: #ffcc00; font-size: 32px; font-weight: bold; pointer-events: none; animation: flyUp 0.8s ease-out forwards; z-index: 100; }
-        @keyframes flyUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-150px); } }
+        .plus-one { position: absolute; color: #ffcc00; font-size: 35px; font-weight: bold; pointer-events: none; animation: flyUp 0.8s ease-out forwards; z-index: 100; }
+        @keyframes flyUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-160px); } }
 
-        /* Navigation */
+        /* Bottom Nav */
         .bottom-nav { position: fixed; bottom: 0; width: 100%; display: flex; background: #000; padding: 15px 0; border-top: 1px solid #222; }
         .nav-item { flex: 1; font-size: 10px; color: #666; cursor: pointer; }
         .nav-item.active { color: #ffcc00; }
 
-        /* Pages */
+        /* Sub Pages */
         .sub-page { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0b0b; z-index: 1000; padding-top: 50px; }
         .back-home { background: #ffcc00; color: black; border: none; padding: 12px 25px; border-radius: 10px; margin-top: 30px; font-weight: bold; cursor: pointer; }
     </style>
@@ -78,7 +97,7 @@
         </div>
 
         <div class="wallet-container">
-            <img src="https://cdn-icons-png.flaticon.com/512/2489/2489756.png" width="30">
+            <div style="width:30px; height:30px; background:#ffcc00; border-radius:50%; border:2px solid #b38f00;"></div>
             <div class="wallet-info">
                 <span class="wallet-label">YOUR EARNING</span>
                 <span class="wallet-coins" id="total-coins">0</span>
@@ -87,7 +106,7 @@
         </div>
 
         <div class="coin-wrapper">
-            <img src="https://cdn-icons-png.flaticon.com/512/2489/2489756.png" id="main-tap-coin" alt="Golden Coin">
+            <div id="main-tap-coin"></div>
         </div>
 
         <div class="bottom-nav">
@@ -98,11 +117,11 @@
         </div>
     </div>
 
-    <div id="upgrade-tap-page" class="sub-page"><h2>Tap Upgrade</h2><button class="back-home" onclick="closeAllPages()">Back</button></div>
-    <div id="upgrade-energy-page" class="sub-page"><h2>Energy Upgrade</h2><button class="back-home" onclick="closeAllPages()">Back</button></div>
-    <div id="task-page" class="sub-page"><h2>More Tasks</h2><button class="back-home" onclick="closeAllPages()">Back</button></div>
-    <div id="friends-page" class="sub-page"><h2>Friends</h2><button class="back-home" onclick="closeAllPages()">Back</button></div>
-    <div id="earn-page" class="sub-page"><h2>Earn More</h2><button class="back-home" onclick="closeAllPages()">Back</button></div>
+    <div id="upgrade-tap-page" class="sub-page"><h2>Tap Upgrade</h2><button class="back-home" onclick="closeAllPages()">Back Home</button></div>
+    <div id="upgrade-energy-page" class="sub-page"><h2>Energy Upgrade</h2><button class="back-home" onclick="closeAllPages()">Back Home</button></div>
+    <div id="task-page" class="sub-page"><h2>More Task</h2><button class="back-home" onclick="closeAllPages()">Back Home</button></div>
+    <div id="friends-page" class="sub-page"><h2>Friends</h2><button class="back-home" onclick="closeAllPages()">Back Home</button></div>
+    <div id="earn-page" class="sub-page"><h2>Earn More</h2><button class="back-home" onclick="closeAllPages()">Back Home</button></div>
 
     <script>
         let tele = window.Telegram.WebApp;
@@ -122,20 +141,31 @@
         document.getElementById('main-tap-coin').addEventListener('click', (e) => {
             if (energy > 0) {
                 score++; energy--;
+                
+                // +1 Animation
                 const p1 = document.createElement('div');
                 p1.innerText = '+1'; p1.className = 'plus-one';
-                p1.style.left = (e.clientX - 15) + 'px';
-                p1.style.top = (e.clientY - 30) + 'px';
+                p1.style.left = (e.clientX - 20) + 'px';
+                p1.style.top = (e.clientY - 40) + 'px';
                 document.body.appendChild(p1);
                 setTimeout(() => p1.remove(), 800);
+                
                 updateUI();
             } else {
                 tele.showAlert("Out of Energy!");
             }
         });
 
-        function openPage(id) { closeAllPages(); document.getElementById(id).style.display = 'block'; }
-        function closeAllPages() { const pages = document.querySelectorAll('.sub-page'); pages.forEach(p => p.style.display = 'none'); }
+        function openPage(id) {
+            closeAllPages();
+            document.getElementById(id).style.display = 'block';
+        }
+
+        function closeAllPages() {
+            const pages = document.querySelectorAll('.sub-page');
+            pages.forEach(p => p.style.display = 'none');
+        }
+
         updateUI();
     </script>
 </body>
