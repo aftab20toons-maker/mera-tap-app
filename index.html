@@ -9,13 +9,13 @@
         body { background: #0b0b0b; color: white; font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; overflow: hidden; user-select: none; display: flex; flex-direction: column; align-items: center; }
         
         /* Stats Row */
-        .stats-container { display: flex; justify-content: space-between; width: 90%; padding: 15px 0; gap: 10px; z-index: 10; }
+        .stats-container { display: flex; justify-content: space-between; width: 90%; padding: 15px 0; gap: 10px; }
         .stat-box { background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 12px; flex: 1; }
         .stat-label { font-size: 10px; color: #888; text-transform: uppercase; }
         .stat-val { font-size: 18px; font-weight: bold; color: #ffcc00; margin-top: 5px; }
 
-        /* Upgrade Buttons */
-        .upgrade-wrapper { display: flex; justify-content: space-between; width: 90%; gap: 10px; margin-bottom: 10px; z-index: 10; }
+        /* Upgrade Buttons Home */
+        .upgrade-wrapper { display: flex; justify-content: space-between; width: 90%; gap: 10px; margin-bottom: 10px; }
         .main-up-btn { background: #1a1a1a; color: #00ffcc; border: 1px solid #333; border-radius: 8px; padding: 10px; flex: 1; cursor: pointer; font-size: 10px; font-weight: bold; text-transform: uppercase; }
 
         /* Wallet Section */
@@ -27,7 +27,6 @@
             align-items: center; 
             padding: 10px 25px; 
             margin: 15px auto; 
-            z-index: 10;
         }
         .wallet-info { text-align: center; margin-left: 10px; }
         .wallet-label { font-size: 10px; color: #aaa; display: block; }
@@ -35,25 +34,19 @@
         .wallet-rs { font-size: 14px; color: #00ffcc; font-weight: bold; margin-left: 10px; }
 
         /* 3D COIN */
-        .coin-wrapper { margin-top: 40px; display: flex; justify-content: center; width: 100%; position: relative; perspective: 1000px; z-index: 5; }
+        .coin-wrapper { margin-top: 40px; display: flex; justify-content: center; width: 100%; position: relative; perspective: 1000px; }
         #main-tap-coin {
-            width: 200px;
-            height: 200px;
+            width: 200px; height: 200px;
             background: radial-gradient(circle, #ffe066 0%, #ffcc00 50%, #b38f00 100%);
-            border-radius: 50%;
-            position: relative;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            border-radius: 50%; position: relative; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
             box-shadow: 0 0 40px rgba(255, 204, 0, 0.6), inset 0 0 20px rgba(255,255,255,0.5);
-            border: 8px solid #cca300;
-            transition: transform 0.1s;
+            border: 8px solid #cca300; transition: transform 0.1s;
         }
-        #main-tap-coin::before { content: "C"; font-size: 80px; font-weight: bold; color: #b38f00; text-shadow: 2px 2px 4px rgba(255,255,255,0.3); }
+        #main-tap-coin::before { content: "C"; font-size: 80px; font-weight: bold; color: #b38f00; }
         #main-tap-coin:active { transform: scale(0.92); }
         
-        /* White +1 Animation */
+        /* Floating Animation */
         .plus-one { 
             position: absolute; color: #ffffff; font-size: 35px; font-weight: bold; 
             pointer-events: none; animation: flyUp 0.8s ease-out forwards; z-index: 100;
@@ -62,16 +55,19 @@
         @keyframes flyUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-160px); } }
 
         /* Bottom Nav */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; display: flex; background: #000; padding: 15px 0; border-top: 1px solid #222; z-index: 100; }
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; display: flex; background: #000; padding: 15px 0; border-top: 1px solid #222; }
         .nav-item { flex: 1; font-size: 10px; color: #666; cursor: pointer; }
         .nav-item.active { color: #ffcc00; }
 
-        /* Sub Pages */
-        .sub-page { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0b0b; z-index: 1000; padding-top: 50px; }
-        .back-home { background: #ffcc00; color: black; border: none; padding: 12px 25px; border-radius: 10px; margin-top: 30px; font-weight: bold; cursor: pointer; }
+        /* Pages */
+        .sub-page { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0b0b; z-index: 1000; padding: 20px; box-sizing: border-box; }
+        .back-home { background: #333; color: white; border: none; padding: 10px 20px; border-radius: 8px; margin-top: 20px; cursor: pointer; }
         
-        .withdraw-card { background: #1a1a1a; margin: 20px; padding: 20px; border-radius: 15px; border: 1px solid #333; }
-        .withdraw-btn { background: #00ffcc; color: black; border: none; padding: 15px 40px; border-radius: 10px; font-weight: bold; margin-top: 20px; cursor: pointer; }
+        /* Upgrade Card Design */
+        .upgrade-card { background: #1a1a1a; border: 1px solid #333; border-radius: 20px; padding: 25px; margin-top: 30px; }
+        .price-tag { color: #ffcc00; font-size: 20px; font-weight: bold; margin: 15px 0; }
+        .buy-btn { background: #00ffcc; color: #000; border: none; padding: 15px 30px; border-radius: 12px; font-weight: bold; width: 100%; cursor: pointer; font-size: 16px; }
+        .buy-btn:disabled { background: #444; color: #888; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -80,7 +76,7 @@
         <div class="stats-container" style="margin: 0 auto;">
             <div class="stat-box">
                 <div class="stat-label">Earn per tap</div>
-                <div class="stat-val">+1</div>
+                <div class="stat-val">+<span id="tap-power-val">1</span></div>
             </div>
             <div class="stat-box">
                 <div class="stat-label">Energy</div>
@@ -114,77 +110,99 @@
         </div>
     </div>
 
-    <div id="upgrade-tap-page" class="sub-page"><h2>Tap Upgrade</h2><button class="back-home" onclick="closeAllPages()">Back Home</button></div>
-    <div id="upgrade-energy-page" class="sub-page"><h2>Energy Upgrade</h2><button class="back-home" onclick="closeAllPages()">Back Home</button></div>
-    <div id="task-page" class="sub-page"><h2>More Task</h2><button class="back-home" onclick="closeAllPages()">Back Home</button></div>
-    <div id="friends-page" class="sub-page"><h2>Friends Section</h2><button class="back-home" onclick="closeAllPages()">Back Home</button></div>
-    
-    <div id="withdraw-page" class="sub-page">
-        <h2>Withdraw Earning</h2>
-        <div class="withdraw-card">
-            <p style="color: #888;">Available Balance</p>
-            <h1 style="color: #00ffcc;">₹<span id="withdraw-balance">0.00</span></h1>
-            <p style="font-size: 12px;">Minimum Withdraw: ₹100</p>
+    <div id="upgrade-tap-page" class="sub-page">
+        <h2 style="color: #00ffcc;">Tap Upgrade Center</h2>
+        <p style="color: #888;">Increase your earning power!</p>
+        
+        <div class="upgrade-card">
+            <h3>🔥 Power Double</h3>
+            <p>Get +2 coins every time you tap!</p>
+            <div class="price-tag">Cost: 100 Coins</div>
+            <button id="buy-upgrade-btn" class="buy-btn" onclick="buyTapUpgrade()">UPGRADE TO LVL 2</button>
         </div>
-        <button class="withdraw-btn" onclick="window.Telegram.WebApp.showAlert('Paisa nikalne ke liye ₹100 chahiye!')">WITHDRAW NOW</button>
-        <br>
-        <button class="back-home" onclick="closeAllPages()">Back Home</button>
+
+        <button class="back-home" onclick="closeAllPages()">← Back to Home</button>
     </div>
+
+    <div id="upgrade-energy-page" class="sub-page"><h2>Energy Upgrade</h2><button class="back-home" onclick="closeAllPages()">Back</button></div>
+    <div id="task-page" class="sub-page"><h2>Tasks</h2><button class="back-home" onclick="closeAllPages()">Back</button></div>
+    <div id="friends-page" class="sub-page"><h2>Friends</h2><button class="back-home" onclick="closeAllPages()">Back</button></div>
+    <div id="withdraw-page" class="sub-page"><h2>Withdraw</h2><button class="back-home" onclick="closeAllPages()">Back</button></div>
 
     <script>
         let tele = window.Telegram.WebApp;
         tele.expand();
 
+        // Data Storage
         let score = parseInt(localStorage.getItem('tap_score')) || 0;
         let energy = parseInt(localStorage.getItem('tap_energy')) || 10;
+        let tapPower = parseInt(localStorage.getItem('tap_power')) || 1; // Default is +1
 
         function updateUI() {
             document.getElementById('total-coins').innerText = score;
             document.getElementById('energy-val').innerText = energy;
-            let rupees = (score / 100).toFixed(2);
-            document.getElementById('total-rs').innerText = rupees;
-            document.getElementById('withdraw-balance').innerText = rupees;
+            document.getElementById('tap-power-val').innerText = tapPower;
+            document.getElementById('total-rs').innerText = (score / 100).toFixed(2);
+
+            // Disable button if already upgraded or not enough coins
+            let upBtn = document.getElementById('buy-upgrade-btn');
+            if(tapPower >= 2) {
+                upBtn.innerText = "MAX LEVEL REACHED";
+                upBtn.disabled = true;
+            }
 
             localStorage.setItem('tap_score', score);
             localStorage.setItem('tap_energy', energy);
+            localStorage.setItem('tap_power', tapPower);
         }
 
-        // Tap Logic Fix
+        // Tap Logic
         document.getElementById('main-tap-coin').addEventListener('click', function(e) {
             if (energy > 0) {
-                score++;
+                score += tapPower; // Use tapPower (+1 or +2)
                 energy--;
                 
-                // +1 Animation
                 const p1 = document.createElement('div');
-                p1.innerText = '+1';
+                p1.innerText = '+' + tapPower;
                 p1.className = 'plus-one';
                 p1.style.left = (e.clientX - 20) + 'px';
                 p1.style.top = (e.clientY - 40) + 'px';
                 document.body.appendChild(p1);
+                setTimeout(() => p1.remove(), 800);
                 
-                setTimeout(() => { p1.remove(); }, 800);
                 updateUI();
             } else {
                 tele.showAlert("Out of Energy!");
             }
         });
 
-        // Page Logic Fix
-        function openPage(pageId) {
-            const pages = document.querySelectorAll('.sub-page');
-            pages.forEach(p => p.style.display = 'none'); // Sab hide karo
-            document.getElementById('home-page').style.display = 'none'; // Home hide karo
-            document.getElementById(pageId).style.display = 'block'; // Target page dikhao
+        // Upgrade Function
+        function buyTapUpgrade() {
+            if (score >= 100) {
+                score -= 100;
+                tapPower = 2; // Level 2
+                tele.showScanQrPopup({text: "Upgrading..."}); // Just for effect
+                setTimeout(() => {
+                    tele.closeScanQrPopup();
+                    tele.showAlert("Badhai ho! Ab aap Level 2 par hain. Har tap par +2 milega!");
+                    updateUI();
+                }, 1000);
+            } else {
+                tele.showAlert("Bhai, kam se kam 100 coins chahiye!");
+            }
+        }
+
+        function openPage(id) {
+            document.querySelectorAll('.sub-page').forEach(p => p.style.display = 'none');
+            document.getElementById('home-page').style.display = 'none';
+            document.getElementById(id).style.display = 'block';
         }
 
         function closeAllPages() {
-            const pages = document.querySelectorAll('.sub-page');
-            pages.forEach(p => p.style.display = 'none');
-            document.getElementById('home-page').style.display = 'block'; // Home wapas lao
+            document.querySelectorAll('.sub-page').forEach(p => p.style.display = 'none');
+            document.getElementById('home-page').style.display = 'block';
         }
 
-        // Initialize UI
         updateUI();
     </script>
 </body>
