@@ -112,13 +112,13 @@
 
     <div id="upgrade-tap-page" class="sub-page">
         <h2 style="color: #00ffcc;">Tap Upgrade Center</h2>
-        <p style="color: #888;">Increase your earning power!</p>
+        <p style="color: #888;">Current Level: <span id="current-lvl-display">1</span></p>
         
         <div class="upgrade-card">
-            <h3>🔥 Power Double</h3>
-            <p>Get +2 coins every time you tap!</p>
-            <div class="price-tag">Cost: 100 Coins</div>
-            <button id="buy-upgrade-btn" class="buy-btn" onclick="buyTapUpgrade()">UPGRADE TO LVL 2</button>
+            <h3 id="upgrade-title">🔥 Power Up</h3>
+            <p id="upgrade-desc">Get +2 coins every time you tap!</p>
+            <div class="price-tag">Cost: <span id="upgrade-cost-display">200</span> Coins</div>
+            <button id="buy-upgrade-btn" class="buy-btn" onclick="buyTapUpgrade()">UPGRADE</button>
         </div>
 
         <button class="back-home" onclick="closeAllPages()">← Back to Home</button>
@@ -136,19 +136,34 @@
         // Data Storage
         let score = parseInt(localStorage.getItem('tap_score')) || 0;
         let energy = parseInt(localStorage.getItem('tap_energy')) || 10;
-        let tapPower = parseInt(localStorage.getItem('tap_power')) || 1; // Default is +1
+        let tapPower = parseInt(localStorage.getItem('tap_power')) || 1; 
 
         function updateUI() {
             document.getElementById('total-coins').innerText = score;
             document.getElementById('energy-val').innerText = energy;
             document.getElementById('tap-power-val').innerText = tapPower;
             document.getElementById('total-rs').innerText = (score / 100).toFixed(2);
+            document.getElementById('current-lvl-display').innerText = tapPower;
 
-            // Disable button if already upgraded or not enough coins
+            // Upgrade Logic for 12 Levels
+            let nextLvl = tapPower + 1;
             let upBtn = document.getElementById('buy-upgrade-btn');
-            if(tapPower >= 2) {
+            
+            if(tapPower >= 12) {
+                document.getElementById('upgrade-title').innerText = "🏆 MAX LEVEL";
+                document.getElementById('upgrade-desc').innerText = "Aapne aakhri level paar kar liya hai!";
+                document.getElementById('upgrade-cost-display').innerText = "---";
                 upBtn.innerText = "MAX LEVEL REACHED";
                 upBtn.disabled = true;
+            } else {
+                // Price Formula: 200 * 2^(nextLvl - 2)
+                // Lvl 2 = 200
+                // Lvl 3 = 400
+                // Lvl 4 = 800
+                let cost = 100 * Math.pow(2, tapPower); 
+                document.getElementById('upgrade-cost-display').innerText = cost;
+                document.getElementById('upgrade-desc').innerText = `Har tap par +${nextLvl} coins milega!`;
+                upBtn.innerText = `UPGRADE TO LVL ${nextLvl}`;
             }
 
             localStorage.setItem('tap_score', score);
@@ -159,7 +174,7 @@
         // Tap Logic
         document.getElementById('main-tap-coin').addEventListener('click', function(e) {
             if (energy > 0) {
-                score += tapPower; // Use tapPower (+1 or +2)
+                score += tapPower;
                 energy--;
                 
                 const p1 = document.createElement('div');
@@ -172,23 +187,20 @@
                 
                 updateUI();
             } else {
-                tele.showAlert("Out of Energy!");
+                tele.showAlert("Energy khatam! Thoda wait karo.");
             }
         });
 
         // Upgrade Function
         function buyTapUpgrade() {
-            if (score >= 100) {
-                score -= 100;
-                tapPower = 2; // Level 2
-                tele.showScanQrPopup({text: "Upgrading..."}); // Just for effect
-                setTimeout(() => {
-                    tele.closeScanQrPopup();
-                    tele.showAlert("Badhai ho! Ab aap Level 2 par hain. Har tap par +2 milega!");
-                    updateUI();
-                }, 1000);
+            let cost = 100 * Math.pow(2, tapPower);
+            if (score >= cost) {
+                score -= cost;
+                tapPower += 1; 
+                tele.showAlert(`Badhai ho! Level ${tapPower} unlocked! Har tap par +${tapPower} milega.`);
+                updateUI();
             } else {
-                tele.showAlert("Bhai, kam se kam 100 coins chahiye!");
+                tele.showAlert(`Bhai, is upgrade ke liye ${cost} coins chahiye!`);
             }
         }
 
