@@ -3,51 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Golden Tap - Battle Style</title>
+    <title>Tapsterra Hourly Loot</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body { background: #0b0b0b; color: white; font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; overflow: hidden; user-select: none; }
         
-        /* Top Stats Bar */
-        .stats-container { display: flex; justify-content: space-between; padding: 15px; gap: 10px; margin-top: 10px; }
-        .stat-box { background: rgba(255, 255, 255, 0.05); border: 1px solid #333; border-radius: 12px; padding: 15px; flex: 1; }
-        .stat-label { font-size: 11px; color: #aaa; text-transform: uppercase; margin-bottom: 5px; }
+        /* Top Stats */
+        .stats-container { display: flex; justify-content: space-between; padding: 15px; gap: 10px; }
+        .stat-box { background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 15px; flex: 1; }
+        .stat-label { font-size: 10px; color: #888; text-transform: uppercase; margin-bottom: 5px; }
         .stat-val { font-size: 18px; font-weight: bold; color: #ffcc00; }
 
-        /* Separate Upgrade Buttons Below Stats */
+        /* Upgrade Buttons */
         .upgrade-wrapper { display: flex; justify-content: space-between; padding: 0 15px; gap: 10px; margin-top: -5px; }
-        .main-up-btn { background: #222; color: #00ffcc; border: 1px solid #444; border-radius: 8px; padding: 8px; flex: 1; cursor: pointer; font-size: 10px; font-weight: bold; transition: 0.2s; }
-        .main-up-btn:active { transform: scale(0.95); background: #333; }
+        .main-up-btn { background: #1a1a1a; color: #00ffcc; border: 1px solid #333; border-radius: 8px; padding: 8px; flex: 1; cursor: pointer; font-size: 10px; font-weight: bold; }
 
-        /* Main Score */
-        .main-score { font-size: 3.2rem; font-weight: bold; margin: 30px 0; text-shadow: 0 0 20px rgba(255, 215, 0, 0.4); display: flex; align-items: center; justify-content: center; }
-        .main-score img { width: 45px; margin-right: 12px; }
+        /* Wallet Area (Marked Section) */
+        .wallet-container { background: rgba(255, 255, 255, 0.03); border: 1px dashed #444; border-radius: 50px; display: inline-flex; align-items: center; padding: 10px 25px; margin: 25px 0; }
+        .wallet-info { text-align: left; margin-left: 10px; }
+        .wallet-label { font-size: 10px; color: #aaa; display: block; }
+        .wallet-coins { font-size: 24px; font-weight: bold; color: white; }
+        .wallet-rs { font-size: 12px; color: #00ffcc; font-weight: bold; margin-left: 10px; }
 
-        /* Coin Area */
-        .coin-wrapper { position: relative; margin-top: 20px; display: inline-block; }
-        #main-coin { width: 230px; height: 230px; cursor: pointer; transition: transform 0.1s; filter: drop-shadow(0 0 20px #ffcc00); }
-        #main-coin:active { transform: scale(0.90); }
+        /* Main Tap Asset */
+        .coin-wrapper { position: relative; margin-top: 10px; display: inline-block; }
+        #main-tap-asset { width: 200px; cursor: pointer; transition: transform 0.1s; filter: drop-shadow(0 0 20px #00ff00); }
+        #main-tap-asset:active { transform: scale(0.92); }
         
-        /* +1 Animation */
-        .plus-one { position: absolute; color: #ffcc00; font-size: 30px; font-weight: bold; pointer-events: none; animation: flyUp 0.8s ease-out forwards; }
-        @keyframes flyUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-130px); } }
+        .plus-one { position: absolute; color: #00ffcc; font-size: 28px; font-weight: bold; pointer-events: none; animation: flyUp 0.8s ease-out forwards; }
+        @keyframes flyUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-120px); } }
 
-        /* Bottom Nav (Optional like image) */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; display: flex; background: #111; padding: 10px 0; border-top: 1px solid #333; }
-        .nav-item { flex: 1; font-size: 10px; color: #888; }
+        /* Bottom Nav */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; display: flex; background: #000; padding: 12px 0; border-top: 1px solid #222; }
+        .nav-item { flex: 1; font-size: 10px; color: #666; cursor: pointer; }
+        .nav-item.active { color: #ffcc00; }
 
-        /* Upgrade Pages */
-        #upgrade-tap-page, #upgrade-energy-page { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0b0b; padding-top: 50px; z-index: 1000; }
-        .back-btn { background: #ffcc00; color: black; border: none; padding: 12px 25px; border-radius: 10px; margin-top: 40px; font-weight: bold; cursor: pointer; }
+        /* Hidden Pages */
+        .sub-page { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0b0b; z-index: 1000; padding-top: 50px; }
+        .back-home { background: #333; color: white; border: none; padding: 10px 20px; border-radius: 8px; margin-top: 30px; }
     </style>
 </head>
 <body>
 
-    <div id="game-page">
+    <div id="home-page">
         <div class="stats-container">
             <div class="stat-box">
                 <div class="stat-label">Earn per tap</div>
-                <div class="stat-val">+<span id="per-tap">1</span></div>
+                <div class="stat-val">+1</div>
             </div>
             <div class="stat-box">
                 <div class="stat-label">Energy</div>
@@ -60,34 +62,32 @@
             <button class="main-up-btn" onclick="openPage('upgrade-energy-page')" style="color: #ffcc00;">⚡ UPGRADE ENERGY</button>
         </div>
 
-        <div class="main-score">
-            <img src="https://cdn-icons-png.flaticon.com/512/2489/2489756.png">
-            <span id="total-score">0</span>
+        <div class="wallet-container">
+            <img src="https://cdn-icons-png.flaticon.com/512/2331/2331711.png" width="35">
+            <div class="wallet-info">
+                <span class="wallet-label">YOUR EARNING</span>
+                <span class="wallet-coins" id="total-coins">0</span>
+                <span class="wallet-rs">≈ ₹<span id="total-rs">0.00</span></span>
+            </div>
         </div>
 
-        <div class="coin-wrapper" id="coin-area">
-            <img src="https://cdn-icons-png.flaticon.com/512/2489/2489756.png" id="main-coin">
+        <div class="coin-wrapper">
+            <img src="https://cdn-icons-png.flaticon.com/512/8142/8142163.png" id="main-tap-asset">
         </div>
 
         <div class="bottom-nav">
-            <div class="nav-item">🏠<br>Home</div>
-            <div class="nav-item">⛏️<br>Mine</div>
-            <div class="nav-item">👥<br>Friends</div>
-            <div class="nav-item">💰<br>Earn</div>
+            <div class="nav-item active" onclick="closeAllPages()">🏠<br>Home</div>
+            <div class="nav-item" onclick="openPage('task-page')">⛏️<br>More Task</div>
+            <div class="nav-item" onclick="openPage('friends-page')">👥<br>Friends</div>
+            <div class="nav-item" onclick="openPage('earn-page')">💰<br>Earn</div>
         </div>
     </div>
 
-    <div id="upgrade-tap-page">
-        <h2>Tap Power Upgrade</h2>
-        <p style="color: #aaa; padding: 20px;">Yahan Tap ki limit badhane ka option aayega...</p>
-        <button class="back-btn" onclick="closePages()">← BACK TO HOME</button>
-    </div>
-
-    <div id="upgrade-energy-page">
-        <h2>Energy Limit Upgrade</h2>
-        <p style="color: #aaa; padding: 20px;">Yahan Max Energy badhane ka option aayega...</p>
-        <button class="back-btn" onclick="closePages()">← BACK TO HOME</button>
-    </div>
+    <div id="upgrade-tap-page" class="sub-page"><h2>Upgrade Tap Power</h2><button class="back-home" onclick="closeAllPages()">Back Home</button></div>
+    <div id="upgrade-energy-page" class="sub-page"><h2>Upgrade Energy Limit</h2><button class="back-home" onclick="closeAllPages()">Back Home</button></div>
+    <div id="task-page" class="sub-page"><h2>More Tasks</h2><p>Complete tasks to earn extra!</p><button class="back-home" onclick="closeAllPages()">Back Home</button></div>
+    <div id="friends-page" class="sub-page"><h2>Invite Friends</h2><p>Earn 10% from friends!</p><button class="back-home" onclick="closeAllPages()">Back Home</button></div>
+    <div id="earn-page" class="sub-page"><h2>Earn More</h2><p>Watch ads or daily check-in.</p><button class="back-home" onclick="closeAllPages()">Back Home</button></div>
 
     <script>
         let tele = window.Telegram.WebApp;
@@ -95,32 +95,24 @@
 
         let score = parseInt(localStorage.getItem('tap_score')) || 0;
         let energy = parseInt(localStorage.getItem('tap_energy')) || 10;
-        let lastRefill = localStorage.getItem('last_refill') || Date.now();
-
-        // 1 Hr Refill Logic
-        setInterval(() => {
-            let now = Date.now();
-            if (now - lastRefill > 3600000 && energy < 10) {
-                energy = 10;
-                lastRefill = now;
-                localStorage.setItem('last_refill', lastRefill);
-                updateUI();
-            }
-        }, 10000);
 
         function updateUI() {
-            document.getElementById('total-score').innerText = score;
+            document.getElementById('total-coins').innerText = score;
             document.getElementById('energy-val').innerText = energy;
+            
+            // 100 Coins = 1 Rs Calculation
+            let rupees = (score / 100).toFixed(2);
+            document.getElementById('total-rs').innerText = rupees;
+
             localStorage.setItem('tap_score', score);
             localStorage.setItem('tap_energy', energy);
         }
 
-        document.getElementById('main-coin').addEventListener('click', (e) => {
+        document.getElementById('main-tap-asset').addEventListener('click', (e) => {
             if (energy > 0) {
                 score++;
                 energy--;
                 
-                // +1 Float Animation
                 const p1 = document.createElement('div');
                 p1.innerText = '+1'; p1.className = 'plus-one';
                 p1.style.left = (e.clientX - 20) + 'px';
@@ -130,17 +122,18 @@
                 
                 updateUI();
             } else {
-                tele.showAlert("Out of Energy! Refills in 1 hour.");
+                tele.showAlert("Energy khatam! 1 ghante baad aao.");
             }
         });
 
         function openPage(id) {
+            closeAllPages();
             document.getElementById(id).style.display = 'block';
         }
 
-        function closePages() {
-            document.getElementById('upgrade-tap-page').style.display = 'none';
-            document.getElementById('upgrade-energy-page').style.display = 'none';
+        function closeAllPages() {
+            const pages = document.querySelectorAll('.sub-page');
+            pages.forEach(p => p.style.display = 'none');
         }
 
         updateUI();
