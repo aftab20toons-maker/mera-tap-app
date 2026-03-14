@@ -8,11 +8,12 @@
     <style>
         body { background: #0b0b0b; color: white; font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; overflow: hidden; user-select: none; display: flex; flex-direction: column; align-items: center; }
         
-        /* Stats Row */
+        /* Stats Row Updated */
         .stats-container { display: flex; justify-content: space-between; width: 90%; padding: 15px 0; gap: 10px; }
         .stat-box { background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 12px; flex: 1; }
-        .stat-label { font-size: 10px; color: #888; text-transform: uppercase; }
-        .stat-val { font-size: 18px; font-weight: bold; color: #ffcc00; margin-top: 5px; }
+        .stat-label { font-size: 9px; color: #888; text-transform: uppercase; margin-bottom: 2px; }
+        .stat-lvl { font-size: 10px; color: #00ffcc; font-weight: bold; display: block; margin-bottom: 4px; }
+        .stat-val { font-size: 16px; font-weight: bold; color: #ffcc00; }
 
         /* Upgrade Buttons */
         .upgrade-wrapper { display: flex; justify-content: space-between; width: 90%; gap: 10px; margin-bottom: 10px; }
@@ -34,7 +35,7 @@
         .wallet-rs { font-size: 14px; color: #00ffcc; font-weight: bold; margin-left: 10px; }
 
         /* 3D COIN */
-        .coin-wrapper { margin-top: 40px; display: flex; justify-content: center; width: 100%; position: relative; perspective: 1000px; }
+        .coin-wrapper { margin-top: 30px; display: flex; justify-content: center; width: 100%; position: relative; perspective: 1000px; }
         #main-tap-coin {
             width: 200px; height: 200px;
             background: radial-gradient(circle, #ffe066 0%, #ffcc00 50%, #b38f00 100%);
@@ -74,10 +75,12 @@
     <div id="home-page" style="width: 100%;">
         <div class="stats-container" style="margin: 0 auto;">
             <div class="stat-box">
+                <span class="stat-lvl">LVL <span id="home-tap-lvl">1</span></span>
                 <div class="stat-label">Earn per tap</div>
                 <div class="stat-val">+<span id="tap-power-val">1</span></div>
             </div>
             <div class="stat-box">
+                <span class="stat-lvl" style="color:#ffcc00;">LVL <span id="home-energy-lvl">1</span></span>
                 <div class="stat-label">Energy</div>
                 <div class="stat-val"><span id="current-energy">10</span>/<span id="max-energy">10</span></div>
             </div>
@@ -111,7 +114,7 @@
 
     <div id="upgrade-tap-page" class="sub-page">
         <h2 style="color: #00ffcc;">Tap Upgrade Center</h2>
-        <p style="color: #888;">Tap Level: <span id="tap-lvl-display">1</span></p>
+        <p style="color: #888;">Current Tap Level: <span id="tap-lvl-display">1</span></p>
         <div class="upgrade-card">
             <h3>🔥 Power Up</h3>
             <p id="tap-upgrade-desc">Har tap par +2 coins milega!</p>
@@ -123,7 +126,7 @@
 
     <div id="upgrade-energy-page" class="sub-page">
         <h2 style="color: #ffcc00;">Energy Upgrade Center</h2>
-        <p style="color: #888;">Energy Level: <span id="energy-lvl-display">1</span></p>
+        <p style="color: #888;">Current Energy Level: <span id="energy-lvl-display">1</span></p>
         <div class="upgrade-card">
             <h3>⚡ Battery Booster</h3>
             <p id="energy-upgrade-desc">Energy limit 20 kar dein!</p>
@@ -148,23 +151,30 @@
         let currentEnergy = parseInt(localStorage.getItem('current_energy')) || maxEnergy;
 
         function updateUI() {
+            // Stats Home Updated with Levels
             document.getElementById('total-coins').innerText = score;
             document.getElementById('tap-power-val').innerText = tapPower;
+            document.getElementById('home-tap-lvl').innerText = tapPower; // Home Tap Level
+            document.getElementById('home-energy-lvl').innerText = energyLvl; // Home Energy Level
+            
             document.getElementById('current-energy').innerText = currentEnergy;
             document.getElementById('max-energy').innerText = maxEnergy;
             document.getElementById('total-rs').innerText = (score / 100).toFixed(2);
+            
+            // Sub Page Displays
             document.getElementById('tap-lvl-display').innerText = tapPower;
+            document.getElementById('energy-lvl-display').innerText = energyLvl;
 
-            let nextTapLvl = tapPower + 1;
+            // Tap Upgrade Logic
             let tapUpBtn = document.getElementById('buy-tap-btn');
             if(tapPower >= 12) { tapUpBtn.innerText = "MAX LEVEL"; tapUpBtn.disabled = true; }
             else { 
                 let tapCost = 100 * Math.pow(2, tapPower);
                 document.getElementById('tap-cost-display').innerText = tapCost;
-                document.getElementById('tap-upgrade-desc').innerText = `Har tap par +${nextTapLvl} coins milega!`;
+                document.getElementById('tap-upgrade-desc').innerText = `Har tap par +${tapPower + 1} coins milega!`;
             }
 
-            document.getElementById('energy-lvl-display').innerText = energyLvl;
+            // Energy Upgrade Logic
             let energyUpBtn = document.getElementById('buy-energy-btn');
             if(energyLvl >= 12) { energyUpBtn.innerText = "MAX LEVEL"; energyUpBtn.disabled = true; }
             else { 
@@ -189,32 +199,31 @@
                 document.body.appendChild(p1);
                 setTimeout(() => p1.remove(), 800);
                 updateUI();
-            } else { tele.showAlert("Energy khatam! Refill ka wait karein."); }
+            } else { tele.showAlert("Energy khatam!"); }
         });
 
         function buyTapUpgrade() {
             let cost = 100 * Math.pow(2, tapPower);
-            if (score >= cost) { score -= cost; tapPower += 1; updateUI(); tele.showAlert("Level Up!"); }
-            else { tele.showAlert(`Minimum ${cost} coins chahiye!`); }
+            if (score >= cost) { score -= cost; tapPower += 1; updateUI(); tele.showAlert("Tap Leveled Up!"); }
+            else { tele.showAlert(`Need ${cost} coins!`); }
         }
 
         function buyEnergyUpgrade() {
             let cost = 50 * Math.pow(2, energyLvl);
             if (score >= cost) { 
                 score -= cost; energyLvl += 1; maxEnergy = energyLvl * 10; currentEnergy = maxEnergy; 
-                updateUI(); tele.showAlert("Battery Boosted!"); 
+                updateUI(); tele.showAlert("Energy Leveled Up!"); 
             }
-            else { tele.showAlert(`Minimum ${cost} coins chahiye!`); }
+            else { tele.showAlert(`Need ${cost} coins!`); }
         }
 
-        // ENERGY REFILL EVERY 1 SECOND 
         setInterval(() => {
             if (currentEnergy < maxEnergy) {
                 currentEnergy++;
                 document.getElementById('current-energy').innerText = currentEnergy;
                 localStorage.setItem('current_energy', currentEnergy);
             }
-        }, 1000); // 1000ms = 1 Second
+        }, 1000);
 
         function openPage(id) {
             document.querySelectorAll('.sub-page').forEach(p => p.style.display = 'none');
