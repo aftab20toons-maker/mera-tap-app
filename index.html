@@ -6,7 +6,7 @@
     <title>Tapsterra Hourly Loot</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        /* PURANE STYLES (NO CHANGE) */
+        /* PURANE STYLES (SAB WAISA HI HAI) */
         body { background: #0b0b0b; color: white; font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; overflow: hidden; user-select: none; display: flex; flex-direction: column; align-items: center; }
         .stats-upgrade-container { display: flex; justify-content: space-between; width: 95%; padding: 5px 0; gap: 8px; margin-top: 5px; }
         .stat-card { flex: 1; display: flex; flex-direction: column; gap: 2px; }
@@ -34,9 +34,13 @@
         .nav-item.active { color: #ffcc00; }
         .upi-form { display: none; background: #222; padding: 15px; border-radius: 12px; margin-top: 10px; border: 1px solid #00ffcc; }
         .upi-input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #000; color: #fff; margin-bottom: 10px; box-sizing: border-box; }
+        
+        /* UPDATED HISTORY STYLE */
         .history-section { margin-top: 30px; text-align: left; padding-bottom: 50px; }
-        .history-item { background: #111; padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #ffcc00; font-size: 13px; }
+        .history-item { background: #111; padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #ffcc00; font-size: 13px; position: relative; }
+        .history-item.success { border-left-color: #00ffcc; }
         .history-note { color: #888; font-size: 10px; margin-top: 5px; font-style: italic; line-height: 1.4; }
+        .success-msg { color: #00ffcc; font-weight: bold; font-size: 11px; margin-top: 5px; }
     </style>
 </head>
 <body>
@@ -129,7 +133,6 @@
     </div>
 
     <script>
-        // JS LOGIC (NO CHANGE EXCEPT HISTORY RENDERING)
         let tele = window.Telegram.WebApp;
         tele.expand();
 
@@ -160,18 +163,23 @@
 
             const historyList = document.getElementById('history-list');
             if (history.length > 0) {
-                historyList.innerHTML = history.map(item => `
-                    <div class="history-item">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <strong style="color:#00ffcc; font-size:16px;">₹${item.amount}</strong>
-                            <span style="background:#ffcc00; color:#000; padding:2px 6px; border-radius:4px; font-size:9px; font-weight:bold;">PENDING</span>
+                historyList.innerHTML = history.map((item, index) => {
+                    let isSuccess = item.status === 'SUCCESS';
+                    return `
+                        <div class="history-item ${isSuccess ? 'success' : ''}" ondblclick="toggleStatus(${index})">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <strong style="color:${isSuccess ? '#00ffcc' : '#ffcc00'}; font-size:16px;">₹${item.amount}</strong>
+                                <span style="background:${isSuccess ? '#00ffcc' : '#ffcc00'}; color:#000; padding:2px 6px; border-radius:4px; font-size:9px; font-weight:bold;">${item.status}</span>
+                            </div>
+                            <div style="color:#888; font-size:10px; margin-top:4px;">UPI: ${item.upi} | ${item.date}</div>
+                            
+                            ${isSuccess ? 
+                                `<div class="success-msg">Mubarak ho! Aapka payment mil gaya hai. Aise hi aur loot machate raho! 💰🔥</div>` : 
+                                `<div class="history-note">Bhai tension mat lo, aapka withdrawal 2 se 10 ghante mein aa jayega. Tab tak aur earning karo! Jitna Tap aur Energy upgrade karoge, utni zyada kamayi hogi! 🚀</div>`
+                            }
                         </div>
-                        <div style="color:#888; font-size:10px; margin-top:4px;">UPI: ${item.upi} | ${item.date}</div>
-                        <div class="history-note">
-                            Bhai tension mat lo, aapka withdrawal 2 se 10 ghante mein aa jayega. Tab tak aur earning karo! Jitna Tap aur Energy upgrade karoge, utni zyada kamayi hogi! 🚀
-                        </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
             }
 
             localStorage.setItem('tap_score', score);
@@ -180,6 +188,12 @@
             localStorage.setItem('withdraw_count', withdrawCount);
             localStorage.setItem('current_energy', currentEnergy);
             localStorage.setItem('withdraw_history', JSON.stringify(history));
+        }
+
+        // HIDDEN ADMIN: History par Double Click karne se Success ho jayega (Check karne ke liye)
+        function toggleStatus(index) {
+            history[index].status = (history[index].status === 'PENDING') ? 'SUCCESS' : 'PENDING';
+            updateUI();
         }
 
         document.getElementById('main-tap-coin').addEventListener('click', (e) => {
@@ -232,9 +246,10 @@
             score -= cost;
             if(pendingType === 'dynamic') withdrawCount++;
             let now = new Date();
-            history.unshift({ amount: pendingAmt, upi: upiId, date: now.toLocaleString() });
+            // NAYA: Status Pending ke saath save hoga
+            history.unshift({ amount: pendingAmt, upi: upiId, date: now.toLocaleString(), status: 'PENDING' });
             cancelUPI(); updateUI();
-            tele.showAlert(`Bhai ₹${pendingAmt} ki request lag gayi hai! Tension na lo.`);
+            tele.showAlert(`Bhai ₹${pendingAmt} ki request lag gayi hai!`);
         }
 
         function showWithdrawOptions() { document.getElementById('upi-step-1').style.display='none'; document.getElementById('upi-step-2').style.display='block'; }
