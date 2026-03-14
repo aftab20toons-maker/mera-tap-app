@@ -9,28 +9,36 @@
         body { background: #0b0b0b; color: white; font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; overflow: hidden; user-select: none; }
         
         /* Top Stats Bar */
-        .stats-container { display: flex; justify-content: space-between; padding: 15px; gap: 10px; }
-        .stat-box { background: rgba(255, 255, 255, 0.05); border: 1px solid #333; border-radius: 12px; padding: 10px; flex: 1; }
-        .stat-label { font-size: 10px; color: #00ffcc; text-transform: uppercase; margin-bottom: 5px; }
-        .stat-val { font-size: 16px; font-weight: bold; }
-        .up-btn { font-size: 9px; background: #00ffcc; color: black; border-radius: 4px; padding: 2px 5px; border: none; margin-top: 5px; cursor: pointer; }
+        .stats-container { display: flex; justify-content: space-between; padding: 15px; gap: 10px; margin-top: 10px; }
+        .stat-box { background: rgba(255, 255, 255, 0.05); border: 1px solid #333; border-radius: 12px; padding: 15px; flex: 1; }
+        .stat-label { font-size: 11px; color: #aaa; text-transform: uppercase; margin-bottom: 5px; }
+        .stat-val { font-size: 18px; font-weight: bold; color: #ffcc00; }
+
+        /* Separate Upgrade Buttons Below Stats */
+        .upgrade-wrapper { display: flex; justify-content: space-between; padding: 0 15px; gap: 10px; margin-top: -5px; }
+        .main-up-btn { background: #222; color: #00ffcc; border: 1px solid #444; border-radius: 8px; padding: 8px; flex: 1; cursor: pointer; font-size: 10px; font-weight: bold; transition: 0.2s; }
+        .main-up-btn:active { transform: scale(0.95); background: #333; }
 
         /* Main Score */
-        .main-score { font-size: 3rem; font-weight: bold; margin: 20px 0; text-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
-        .main-score img { width: 30px; vertical-align: middle; margin-right: 10px; }
+        .main-score { font-size: 3.2rem; font-weight: bold; margin: 30px 0; text-shadow: 0 0 20px rgba(255, 215, 0, 0.4); display: flex; align-items: center; justify-content: center; }
+        .main-score img { width: 45px; margin-right: 12px; }
 
         /* Coin Area */
-        .coin-wrapper { position: relative; margin-top: 30px; display: inline-block; }
-        #main-coin { width: 220px; height: 220px; border-radius: 50%; cursor: pointer; transition: transform 0.1s; }
-        #main-coin:active { transform: scale(0.92); }
+        .coin-wrapper { position: relative; margin-top: 20px; display: inline-block; }
+        #main-coin { width: 230px; height: 230px; cursor: pointer; transition: transform 0.1s; filter: drop-shadow(0 0 20px #ffcc00); }
+        #main-coin:active { transform: scale(0.90); }
         
-        /* Floating Animation */
-        .plus-one { position: absolute; color: #ffcc00; font-size: 28px; font-weight: bold; pointer-events: none; animation: flyUp 0.8s ease-out forwards; }
-        @keyframes flyUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-120px); } }
+        /* +1 Animation */
+        .plus-one { position: absolute; color: #ffcc00; font-size: 30px; font-weight: bold; pointer-events: none; animation: flyUp 0.8s ease-out forwards; }
+        @keyframes flyUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-130px); } }
 
-        /* Navigation Pages */
-        #upgrade-page, #energy-page { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0b0b; padding-top: 50px; z-index: 1000; }
-        .back-btn { background: #333; color: white; border: none; padding: 10px 20px; border-radius: 8px; margin-top: 20px; }
+        /* Bottom Nav (Optional like image) */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; display: flex; background: #111; padding: 10px 0; border-top: 1px solid #333; }
+        .nav-item { flex: 1; font-size: 10px; color: #888; }
+
+        /* Upgrade Pages */
+        #upgrade-tap-page, #upgrade-energy-page { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0b0b; padding-top: 50px; z-index: 1000; }
+        .back-btn { background: #ffcc00; color: black; border: none; padding: 12px 25px; border-radius: 10px; margin-top: 40px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -40,35 +48,45 @@
             <div class="stat-box">
                 <div class="stat-label">Earn per tap</div>
                 <div class="stat-val">+<span id="per-tap">1</span></div>
-                <button class="up-btn" onclick="openPage('upgrade-page')">UPGRADE</button>
             </div>
             <div class="stat-box">
                 <div class="stat-label">Energy</div>
                 <div class="stat-val"><span id="energy-val">10</span>/10</div>
-                <button class="up-btn" onclick="openPage('energy-page')" style="background: #ffcc00;">UPGRADE</button>
             </div>
         </div>
 
+        <div class="upgrade-wrapper">
+            <button class="main-up-btn" onclick="openPage('upgrade-tap-page')">🚀 UPGRADE TAP</button>
+            <button class="main-up-btn" onclick="openPage('upgrade-energy-page')" style="color: #ffcc00;">⚡ UPGRADE ENERGY</button>
+        </div>
+
         <div class="main-score">
-            <img src="https://cdn-icons-png.flaticon.com/512/2489/2489756.png" alt="coin">
+            <img src="https://cdn-icons-png.flaticon.com/512/2489/2489756.png">
             <span id="total-score">0</span>
         </div>
 
         <div class="coin-wrapper" id="coin-area">
             <img src="https://cdn-icons-png.flaticon.com/512/2489/2489756.png" id="main-coin">
         </div>
+
+        <div class="bottom-nav">
+            <div class="nav-item">🏠<br>Home</div>
+            <div class="nav-item">⛏️<br>Mine</div>
+            <div class="nav-item">👥<br>Friends</div>
+            <div class="nav-item">💰<br>Earn</div>
+        </div>
     </div>
 
-    <div id="upgrade-page">
-        <h2>Upgrade Tap Power</h2>
-        <p style="color: #888;">Nayi updates yahan aayengi...</p>
-        <button class="back-btn" onclick="closePages()">← Back</button>
+    <div id="upgrade-tap-page">
+        <h2>Tap Power Upgrade</h2>
+        <p style="color: #aaa; padding: 20px;">Yahan Tap ki limit badhane ka option aayega...</p>
+        <button class="back-btn" onclick="closePages()">← BACK TO HOME</button>
     </div>
 
-    <div id="energy-page">
-        <h2>Upgrade Energy Limit</h2>
-        <p style="color: #888;">Nayi updates yahan aayengi...</p>
-        <button class="back-btn" onclick="closePages()">← Back</button>
+    <div id="upgrade-energy-page">
+        <h2>Energy Limit Upgrade</h2>
+        <p style="color: #aaa; padding: 20px;">Yahan Max Energy badhane ka option aayega...</p>
+        <button class="back-btn" onclick="closePages()">← BACK TO HOME</button>
     </div>
 
     <script>
@@ -79,10 +97,10 @@
         let energy = parseInt(localStorage.getItem('tap_energy')) || 10;
         let lastRefill = localStorage.getItem('last_refill') || Date.now();
 
-        // 1 Hr Refill Logic (10 Energy per hour)
+        // 1 Hr Refill Logic
         setInterval(() => {
             let now = Date.now();
-            if (now - lastRefill > 3600000 && energy < 10) { // 3600000ms = 1hr
+            if (now - lastRefill > 3600000 && energy < 10) {
                 energy = 10;
                 lastRefill = now;
                 localStorage.setItem('last_refill', lastRefill);
@@ -102,7 +120,7 @@
                 score++;
                 energy--;
                 
-                // Animation
+                // +1 Float Animation
                 const p1 = document.createElement('div');
                 p1.innerText = '+1'; p1.className = 'plus-one';
                 p1.style.left = (e.clientX - 20) + 'px';
@@ -112,7 +130,7 @@
                 
                 updateUI();
             } else {
-                alert("Out of Energy! Wait for 1 hour.");
+                tele.showAlert("Out of Energy! Refills in 1 hour.");
             }
         });
 
@@ -121,8 +139,8 @@
         }
 
         function closePages() {
-            document.getElementById('upgrade-page').style.display = 'none';
-            document.getElementById('energy-page').style.display = 'none';
+            document.getElementById('upgrade-tap-page').style.display = 'none';
+            document.getElementById('upgrade-energy-page').style.display = 'none';
         }
 
         updateUI();
