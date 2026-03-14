@@ -8,16 +8,16 @@
     <style>
         body { background: #0b0b0b; color: white; font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; display: flex; flex-direction: column; align-items: center; height: 100vh; overflow: hidden; }
         
-        /* Stats Styling */
+        /* Stats */
         .stats-container { display: flex; justify-content: space-between; width: 90%; margin-top: 15px; gap: 10px; }
         .stat-box { flex: 1; background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 10px; }
-        .stat-lvl { font-size: 10px; color: #00ffcc; font-weight: bold; display: block; }
+        .stat-lvl { font-size: 10px; color: #00ffcc; font-weight: bold; }
         .stat-val { font-size: 18px; font-weight: bold; color: #ffcc00; margin-top: 5px; }
-        .stat-label { font-size: 8px; color: #888; text-transform: uppercase; }
+        .stat-label { font-size: 8px; color: #888; text-transform: uppercase; display: block; }
 
-        /* Upgrade Buttons */
+        /* Buttons */
         .upgrade-row { display: flex; justify-content: space-between; width: 90%; margin-top: 10px; gap: 10px; }
-        .up-btn { flex: 1; background: #1a1a1a; color: #00ffcc; border: 1px solid #333; border-radius: 8px; padding: 8px; font-size: 10px; font-weight: bold; cursor: pointer; }
+        .up-btn { flex: 1; background: #1a1a1a; color: #00ffcc; border: 1px solid #333; border-radius: 8px; padding: 10px; font-size: 10px; font-weight: bold; cursor: pointer; }
         .up-btn.energy { color: #ffcc00; }
 
         /* Wallet */
@@ -25,50 +25,41 @@
         .wallet-coins { font-size: 24px; font-weight: bold; }
         .wallet-rs { font-size: 16px; color: #00ffcc; border-left: 1px solid #444; padding-left: 10px; }
 
-        /* CIRCLE COIN FIX */
+        /* Coin */
         .coin-area { flex-grow: 1; display: flex; align-items: center; justify-content: center; }
-        #main-tap-coin { 
-            width: 200px; height: 200px; /* Equal width and height for perfect circle */
-            background: radial-gradient(circle, #ffe066 0%, #ffcc00 50%, #b38f00 100%); 
-            border-radius: 50%; /* Makes it round */
-            cursor: pointer; display: flex; align-items: center; justify-content: center; 
-            box-shadow: 0 0 40px rgba(255, 204, 0, 0.3); 
-            border: 10px solid #cca300; transition: transform 0.05s; 
-        }
+        #main-tap-coin { width: 200px; height: 200px; background: radial-gradient(circle, #ffe066 0%, #ffcc00 50%, #b38f00 100%); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 40px rgba(255, 204, 0, 0.3); border: 10px solid #cca300; transition: transform 0.05s; }
         #main-tap-coin:active { transform: scale(0.95); }
         #main-tap-coin::before { content: "T"; font-size: 90px; font-weight: bold; color: #b38f00; }
 
-        /* Floating +1 */
-        .plus-one { position: absolute; color: white; font-size: 28px; font-weight: bold; animation: fly 0.6s ease-out forwards; pointer-events: none; }
+        /* Plus One Animation */
+        .plus-one { position: absolute; color: white; font-size: 28px; font-weight: bold; animation: fly 0.6s ease-out forwards; pointer-events: none; z-index: 100; }
         @keyframes fly { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-120px); } }
 
-        /* Ads */
-        .banner-ad { width: 100%; height: 50px; background: #000; color: #333; font-size: 10px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #1a1a1a; }
-
-        /* Nav */
+        /* Navigation */
         .nav-bar { position: fixed; bottom: 0; width: 100%; display: flex; background: #000; padding: 12px 0; border-top: 1px solid #222; }
         .nav-item { flex: 1; font-size: 12px; color: #666; cursor: pointer; }
         .nav-item.active { color: #ffcc00; }
 
-        .sub-page { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0b0b; padding: 20px; box-sizing: border-box; z-index: 100; overflow-y: auto; }
+        /* Pages */
+        .sub-page { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0b0b; padding: 20px; box-sizing: border-box; z-index: 1000; }
+        .card { background: #1a1a1a; padding: 20px; border-radius: 15px; border: 1px solid #333; margin-top: 20px; }
+        .buy-btn { background: #00ffcc; color: #000; border: none; width: 100%; padding: 15px; border-radius: 10px; font-weight: bold; margin-top: 15px; cursor: pointer; }
+        .back-btn { background: #333; color: white; border: none; padding: 10px 20px; border-radius: 8px; margin-top: 20px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="banner-ad">BANNER AD HERE</div>
-
     <div id="home-page" style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center;">
-        
         <div class="stats-container">
             <div class="stat-box">
-                <span class="stat-lvl">LVL <span id="tap-lvl">1</span></span>
-                <div class="stat-val">+<span id="tap-val">1</span></div>
-                <div class="stat-label">Earn per tap</div>
+                <span class="stat-lvl">LVL <span id="tap-lvl-disp">1</span></span>
+                <div class="stat-val">+<span id="tap-val-disp">1</span></div>
+                <span class="stat-label">Earn per tap</span>
             </div>
             <div class="stat-box">
-                <span class="stat-lvl" style="color:#ffcc00">LVL <span id="eng-lvl">1</span></span>
+                <span class="stat-lvl" style="color:#ffcc00">LVL <span id="eng-lvl-disp">1</span></span>
                 <div class="stat-val"><span id="curr-e">100</span>/<span id="max-e">100</span></div>
-                <div class="stat-label">Energy</div>
+                <span class="stat-label">Energy</span>
             </div>
         </div>
 
@@ -92,17 +83,37 @@
         </div>
     </div>
 
+    <div id="upgrade-tap" class="sub-page">
+        <h2>Upgrade Tap Power</h2>
+        <div class="card">
+            <p>Current Level: <span id="u-tap-lvl">1</span></p>
+            <h3 id="u-tap-cost">Cost: 100 Coins</h3>
+            <button class="buy-btn" onclick="buyTap()">UPGRADE NOW</button>
+        </div>
+        <button class="back-btn" onclick="closePages()">← Back</button>
+    </div>
+
+    <div id="upgrade-energy" class="sub-page">
+        <h2 style="color:#ffcc00">Upgrade Max Energy</h2>
+        <div class="card">
+            <p>Current Level: <span id="u-eng-lvl">1</span></p>
+            <h3 id="u-eng-cost">Cost: 100 Coins</h3>
+            <button class="buy-btn" style="background:#ffcc00" onclick="buyEnergy()">UPGRADE NOW</button>
+        </div>
+        <button class="back-btn" onclick="closePages()">← Back</button>
+    </div>
+
     <div id="withdraw-page" class="sub-page">
         <h2 style="color:#00ffcc">Withdraw</h2>
-        <div style="background:#1a1a1a; padding:20px; border-radius:15px; margin-top:20px;">
-            <input type="text" id="upi-id" placeholder="UPI ID (name@apl)" style="width:100%; padding:12px; border-radius:8px; border:none; margin-bottom:15px;">
-            <button class="up-btn" style="width:100%; padding:15px;" onclick="requestWithdraw()">Withdraw Request</button>
+        <div class="card">
+            <input type="text" id="upi-id" placeholder="Enter UPI ID" style="width:100%; padding:12px; border-radius:8px; border:none; margin-bottom:15px; box-sizing:border-box;">
+            <button class="buy-btn" onclick="requestWithdraw()">SUBMIT REQUEST</button>
         </div>
         <div id="history" style="text-align:left; margin-top:20px;">
             <h3>History</h3>
             <div id="hist-list" style="font-size:12px; color:#888;">No history yet.</div>
         </div>
-        <button class="up-btn" style="margin-top:30px;" onclick="closePages()">Back</button>
+        <button class="back-btn" onclick="closePages()">← Back</button>
     </div>
 
     <script>
@@ -120,11 +131,17 @@
         function updateUI() {
             document.getElementById('score').innerText = score;
             document.getElementById('rs').innerText = (score/100).toFixed(2);
-            document.getElementById('tap-lvl').innerText = tapLvl;
-            document.getElementById('tap-val').innerText = tapLvl;
-            document.getElementById('eng-lvl').innerText = engLvl;
+            document.getElementById('tap-lvl-disp').innerText = tapLvl;
+            document.getElementById('tap-val-disp').innerText = tapLvl;
+            document.getElementById('eng-lvl-disp').innerText = engLvl;
             document.getElementById('curr-e').innerText = currE;
             document.getElementById('max-e').innerText = maxE;
+            
+            // Update Upgrade Pages
+            document.getElementById('u-tap-lvl').innerText = tapLvl;
+            document.getElementById('u-tap-cost').innerText = "Cost: " + (tapLvl * 100) + " Coins";
+            document.getElementById('u-eng-lvl').innerText = engLvl;
+            document.getElementById('u-eng-cost').innerText = "Cost: " + (engLvl * 100) + " Coins";
 
             const list = document.getElementById('hist-list');
             if(history.length > 0) {
@@ -153,19 +170,34 @@
                 document.body.appendChild(p);
                 setTimeout(() => p.remove(), 600);
                 updateUI();
-            } else { tele.showAlert("Energy khatam!"); }
+            } else { tele.showAlert("Energy khatam! Wait karo."); }
         });
+
+        function buyTap() {
+            let cost = tapLvl * 100;
+            if(score >= cost) { score -= cost; tapLvl++; updateUI(); tele.showAlert("Tap Power Upgraded!"); }
+            else { tele.showAlert("Coins kam hain!"); }
+        }
+
+        function buyEnergy() {
+            let cost = engLvl * 100;
+            if(score >= cost) { score -= cost; engLvl++; maxE = engLvl * 100; currE = maxE; updateUI(); tele.showAlert("Energy Upgraded!"); }
+            else { tele.showAlert("Coins kam hain!"); }
+        }
 
         function requestWithdraw() {
             let upi = document.getElementById('upi-id').value;
             if(!upi.includes('@')) return tele.showAlert("UPI ID sahi dalo");
-            if(score < 100) return tele.showAlert("Min ₹1 chahiye");
+            if(score < 100) return tele.showAlert("Min ₹1 (100 coins) chahiye");
             history.unshift({ amt: (score/100).toFixed(2), upi: upi, status: 'PENDING', date: new Date().toLocaleString() });
             score = 0; updateUI();
-            tele.showAlert("Request sent!");
+            tele.showAlert("Request sent successfully!");
         }
 
-        function openPage(id) { document.getElementById(id).style.display = 'block'; }
+        function openPage(id) { 
+            document.querySelectorAll('.sub-page').forEach(p=>p.style.display='none');
+            document.getElementById(id).style.display = 'block'; 
+        }
         function closePages() { document.querySelectorAll('.sub-page').forEach(p=>p.style.display='none'); }
 
         setInterval(() => { if(currE < maxE) { currE++; updateUI(); } }, 2000);
