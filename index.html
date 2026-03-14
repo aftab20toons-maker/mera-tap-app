@@ -6,7 +6,7 @@
     <title>Tapsterra Hourly Loot</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        /* PURANA STYLE BILKUL WAISA HI HAI */
+        /* SAARE PURANE STYLES WAISA HI HAIN - NO CHANGE */
         body { background: #0b0b0b; color: white; font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; overflow: hidden; user-select: none; display: flex; flex-direction: column; align-items: center; }
         .stats-upgrade-container { display: flex; justify-content: space-between; width: 95%; padding: 5px 0; gap: 8px; margin-top: 5px; }
         .stat-card { flex: 1; display: flex; flex-direction: column; gap: 2px; }
@@ -32,8 +32,6 @@
         .bottom-nav { position: fixed; bottom: 0; width: 100%; display: flex; background: #000; padding: 12px 0; border-top: 1px solid #222; }
         .nav-item { flex: 1; font-size: 11px; color: #666; cursor: pointer; }
         .nav-item.active { color: #ffcc00; }
-
-        /* NAYA UPI FORM & HISTORY STYLE */
         .upi-form { display: none; background: #222; padding: 15px; border-radius: 12px; margin-top: 10px; border: 1px solid #00ffcc; }
         .upi-input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #000; color: #fff; margin-bottom: 10px; box-sizing: border-box; }
         .history-section { margin-top: 30px; text-align: left; }
@@ -99,26 +97,22 @@
 
     <div id="withdraw-page" class="sub-page">
         <h2 style="color:#00ffcc">Withdraw Your Earning</h2>
-        
         <div id="upi-step-1">
             <div class="upgrade-card" onclick="showWithdrawOptions()" style="cursor:pointer">
                 <strong>📱 UPI Se Nikalein</strong>
                 <p style="font-size: 12px; color:#888">GPay, PhonePe, Paytm</p>
             </div>
         </div>
-
         <div id="upi-step-2" style="display:none">
             <div class="upgrade-card">
                 <div id="amount-selection">
                     <h3 id="dyn-title" style="color:#00ffcc">₹1 Option</h3>
                     <button class="buy-btn" onclick="askUPI('dynamic')">Abhi Nikalein</button>
-                    
                     <div style="margin-top:20px; border-top:1px solid #333; padding-top:10px;">
                         <h3 style="color:#ffcc00">₹10 Option (Hamesha)</h3>
                         <button class="buy-btn" style="background:#ffcc00" onclick="askUPI('fixed')">Abhi Nikalein</button>
                     </div>
                 </div>
-
                 <div id="upi-form-box" class="upi-form">
                     <p style="font-size: 12px; color:#00ffcc;">Nikali ja rahi rashi: ₹<span id="selected-amt">0</span></p>
                     <input type="text" id="upi-id-input" class="upi-input" placeholder="Apni UPI ID daalein">
@@ -128,14 +122,12 @@
             </div>
             <button class="back-home" onclick="resetWithdraw()">← Piche Jao</button>
         </div>
-
         <div class="history-section">
             <h3 style="font-size: 14px; border-bottom: 1px solid #333; padding-bottom: 5px;">Withdrawal History</h3>
             <div id="history-list">
                 <p style="font-size: 10px; color:#666;">Abhi tak koi withdraw nahi kiya.</p>
             </div>
         </div>
-        
         <button class="back-home" style="background:#222" onclick="closeAllPages()">Band Karo</button>
     </div>
 
@@ -187,55 +179,12 @@
             localStorage.setItem('withdraw_history', JSON.stringify(history));
         }
 
-        // --- NEW FLOW FUNCTIONS ---
-        function askUPI(type) {
-            let amt = (type === 'dynamic') ? (withdrawCount + 1) : 10;
-            let cost = amt * 100;
-
-            if(score >= cost) {
-                pendingAmt = amt;
-                pendingType = type;
-                document.getElementById('selected-amt').innerText = amt;
-                document.getElementById('amount-selection').style.display = 'none';
-                document.getElementById('upi-form-box').style.display = 'block';
-            } else {
-                tele.showAlert(`Bhai kam se kam ${cost} coins ki jarurat hai!`);
-            }
-        }
-
-        function cancelUPI() {
-            document.getElementById('amount-selection').style.display = 'block';
-            document.getElementById('upi-form-box').style.display = 'none';
-        }
-
-        function finalConfirm() {
-            let upiId = document.getElementById('upi-id-input').value;
-            if(!upiId || upiId.length < 5 || !upiId.includes('@')) {
-                tele.showAlert("Bhai pehle sahi UPI ID toh daalo!");
-                return;
-            }
-
-            let cost = pendingAmt * 100;
-            score -= cost;
-            if(pendingType === 'dynamic') withdrawCount++;
-
-            let now = new Date();
-            history.unshift({
-                amount: pendingAmt,
-                upi: upiId,
-                date: now.toLocaleString()
-            });
-
-            cancelUPI(); // Form band karke selection wapas lao
-            updateUI();
-            tele.showAlert(`Bhai ₹${pendingAmt} ka withdraw Pending mein chala gaya hai!`);
-        }
-        // --- END NEW FLOW ---
-
+        // --- FIXED TAP LOGIC (1 Click = 1 Energy) ---
         document.getElementById('main-tap-coin').addEventListener('click', (e) => {
-            if(currentEnergy >= tapPower) {
-                score += tapPower;
-                currentEnergy -= tapPower;
+            if(currentEnergy >= 1) { // Pehle yahan tapPower tha, ab 1 hai
+                score += tapPower;   // Coins poore milenge
+                currentEnergy -= 1;  // Energy sirf 1 kategi
+                
                 let p = document.createElement('div');
                 p.innerText = "+" + tapPower; p.className = 'plus-one';
                 p.style.left = e.clientX + 'px'; p.style.top = e.clientY + 'px';
@@ -247,6 +196,7 @@
 
         setInterval(() => { if(currentEnergy < maxEnergy) { currentEnergy++; updateUI(); } }, 1500);
 
+        // --- SAARE BAAKI FUNCTIONS SAME HAIN ---
         function buyTapUpgrade() {
             let cost = 100 * Math.pow(2, tapPower);
             if(score >= cost) { score -= cost; tapPower++; updateUI(); tele.showAlert("Mubarak ho! Tap Power badh gayi."); }
@@ -257,6 +207,34 @@
             let cost = 50 * Math.pow(2, energyLvl);
             if(score >= cost) { score -= cost; energyLvl++; maxEnergy = energyLvl * 100; currentEnergy = maxEnergy; updateUI(); tele.showAlert("Mubarak ho! Energy badh gayi."); }
             else { tele.showAlert(`Bhai, abhi ${cost} coins ki jarurat hai!`); }
+        }
+
+        function askUPI(type) {
+            let amt = (type === 'dynamic') ? (withdrawCount + 1) : 10;
+            let cost = amt * 100;
+            if(score >= cost) {
+                pendingAmt = amt; pendingType = type;
+                document.getElementById('selected-amt').innerText = amt;
+                document.getElementById('amount-selection').style.display = 'none';
+                document.getElementById('upi-form-box').style.display = 'block';
+            } else { tele.showAlert(`Bhai kam se kam ${cost} coins ki jarurat hai!`); }
+        }
+
+        function cancelUPI() {
+            document.getElementById('amount-selection').style.display = 'block';
+            document.getElementById('upi-form-box').style.display = 'none';
+        }
+
+        function finalConfirm() {
+            let upiId = document.getElementById('upi-id-input').value;
+            if(!upiId || upiId.length < 5 || !upiId.includes('@')) { tele.showAlert("Bhai pehle sahi UPI ID toh daalo!"); return; }
+            let cost = pendingAmt * 100;
+            score -= cost;
+            if(pendingType === 'dynamic') withdrawCount++;
+            let now = new Date();
+            history.unshift({ amount: pendingAmt, upi: upiId, date: now.toLocaleString() });
+            cancelUPI(); updateUI();
+            tele.showAlert(`Bhai ₹${pendingAmt} ka withdraw Pending mein chala gaya hai!`);
         }
 
         function showWithdrawOptions() { document.getElementById('upi-step-1').style.display='none'; document.getElementById('upi-step-2').style.display='block'; }
