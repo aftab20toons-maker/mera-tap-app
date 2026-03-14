@@ -33,8 +33,9 @@
         .nav-item { flex: 1; font-size: 11px; color: #666; cursor: pointer; }
         .nav-item.active { color: #ffcc00; }
 
-        /* NAYA UPI INPUT & HISTORY STYLE */
-        .upi-input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #000; color: #fff; margin-top: 10px; box-sizing: border-box; }
+        /* NAYA UPI FORM & HISTORY STYLE */
+        .upi-form { display: none; background: #222; padding: 15px; border-radius: 12px; margin-top: 10px; border: 1px solid #00ffcc; }
+        .upi-input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #000; color: #fff; margin-bottom: 10px; box-sizing: border-box; }
         .history-section { margin-top: 30px; text-align: left; }
         .history-item { background: #111; padding: 10px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid #00ffcc; font-size: 12px; }
     </style>
@@ -98,29 +99,38 @@
 
     <div id="withdraw-page" class="sub-page">
         <h2 style="color:#00ffcc">Withdraw Your Earning</h2>
+        
         <div id="upi-step-1">
             <div class="upgrade-card" onclick="showWithdrawOptions()" style="cursor:pointer">
                 <strong>📱 UPI Se Nikalein</strong>
                 <p style="font-size: 12px; color:#888">GPay, PhonePe, Paytm</p>
             </div>
         </div>
+
         <div id="upi-step-2" style="display:none">
             <div class="upgrade-card">
-                <input type="text" id="upi-id-input" class="upi-input" placeholder="Apni UPI ID daalein (e.g. name@upi)">
-                
-                <h3 id="dyn-title">₹1 Nikalein</h3>
-                <button class="buy-btn" onclick="processWithdraw('dynamic')">Abhi Nikalein</button>
-                
-                <div style="margin-top:20px; border-top:1px solid #333; padding-top:10px;">
-                    <h3>₹10 Nikalein (Hamesha)</h3>
-                    <button class="buy-btn" style="background:#ffcc00" onclick="processWithdraw('fixed')">Abhi Nikalein</button>
+                <div id="amount-selection">
+                    <h3 id="dyn-title" style="color:#00ffcc">₹1 Option</h3>
+                    <button class="buy-btn" onclick="askUPI('dynamic')">Abhi Nikalein</button>
+                    
+                    <div style="margin-top:20px; border-top:1px solid #333; padding-top:10px;">
+                        <h3 style="color:#ffcc00">₹10 Option (Hamesha)</h3>
+                        <button class="buy-btn" style="background:#ffcc00" onclick="askUPI('fixed')">Abhi Nikalein</button>
+                    </div>
+                </div>
+
+                <div id="upi-form-box" class="upi-form">
+                    <p style="font-size: 12px; color:#00ffcc;">Nikali ja rahi rashi: ₹<span id="selected-amt">0</span></p>
+                    <input type="text" id="upi-id-input" class="upi-input" placeholder="Apni UPI ID daalein">
+                    <button class="buy-btn" onclick="finalConfirm()">CONFRIM NIKALEIN</button>
+                    <button class="back-home" style="margin-top:5px; padding:5px; font-size:10px;" onclick="cancelUPI()">Cancel</button>
                 </div>
             </div>
             <button class="back-home" onclick="resetWithdraw()">← Piche Jao</button>
         </div>
 
         <div class="history-section">
-            <h3 style="font-size: 14px; border-bottom: 1px solid #333; padding-bottom: 5px;">Nikale Gaye Paise (History)</h3>
+            <h3 style="font-size: 14px; border-bottom: 1px solid #333; padding-bottom: 5px;">Withdrawal History</h3>
             <div id="history-list">
                 <p style="font-size: 10px; color:#666;">Abhi tak koi withdraw nahi kiya.</p>
             </div>
@@ -139,6 +149,9 @@
         let withdrawCount = parseInt(localStorage.getItem('withdraw_count')) || 0;
         let history = JSON.parse(localStorage.getItem('withdraw_history')) || [];
         
+        let pendingAmt = 0;
+        let pendingType = '';
+
         let maxEnergy = energyLvl * 100;
         let currentEnergy = parseInt(localStorage.getItem('current_energy')) || maxEnergy;
 
@@ -156,13 +169,12 @@
             document.getElementById('energy-cost-display').innerText = (50 * Math.pow(2, energyLvl)) + " Coins Ki Jarurat Hai";
             document.getElementById('dyn-title').innerText = `₹${withdrawCount + 1} Nikalein`;
 
-            // Update History List
             const historyList = document.getElementById('history-list');
             if (history.length > 0) {
                 historyList.innerHTML = history.map(item => `
                     <div class="history-item">
                         <strong>₹${item.amount}</strong> - ${item.upi} <br>
-                        <span style="color:#888; font-size:9px;">${item.date} | Status: Pending</span>
+                        <span style="color:#ffaa00; font-size:9px;">${item.date} | Status: PENDING</span>
                     </div>
                 `).join('');
             }
@@ -174,6 +186,51 @@
             localStorage.setItem('current_energy', currentEnergy);
             localStorage.setItem('withdraw_history', JSON.stringify(history));
         }
+
+        // --- NEW FLOW FUNCTIONS ---
+        function askUPI(type) {
+            let amt = (type === 'dynamic') ? (withdrawCount + 1) : 10;
+            let cost = amt * 100;
+
+            if(score >= cost) {
+                pendingAmt = amt;
+                pendingType = type;
+                document.getElementById('selected-amt').innerText = amt;
+                document.getElementById('amount-selection').style.display = 'none';
+                document.getElementById('upi-form-box').style.display = 'block';
+            } else {
+                tele.showAlert(`Bhai kam se kam ${cost} coins ki jarurat hai!`);
+            }
+        }
+
+        function cancelUPI() {
+            document.getElementById('amount-selection').style.display = 'block';
+            document.getElementById('upi-form-box').style.display = 'none';
+        }
+
+        function finalConfirm() {
+            let upiId = document.getElementById('upi-id-input').value;
+            if(!upiId || upiId.length < 5 || !upiId.includes('@')) {
+                tele.showAlert("Bhai pehle sahi UPI ID toh daalo!");
+                return;
+            }
+
+            let cost = pendingAmt * 100;
+            score -= cost;
+            if(pendingType === 'dynamic') withdrawCount++;
+
+            let now = new Date();
+            history.unshift({
+                amount: pendingAmt,
+                upi: upiId,
+                date: now.toLocaleString()
+            });
+
+            cancelUPI(); // Form band karke selection wapas lao
+            updateUI();
+            tele.showAlert(`Bhai ₹${pendingAmt} ka withdraw Pending mein chala gaya hai!`);
+        }
+        // --- END NEW FLOW ---
 
         document.getElementById('main-tap-coin').addEventListener('click', (e) => {
             if(currentEnergy >= tapPower) {
@@ -203,35 +260,7 @@
         }
 
         function showWithdrawOptions() { document.getElementById('upi-step-1').style.display='none'; document.getElementById('upi-step-2').style.display='block'; }
-        function resetWithdraw() { document.getElementById('upi-step-1').style.display='block'; document.getElementById('upi-step-2').style.display='none'; }
-        
-        function processWithdraw(type) {
-            let upiId = document.getElementById('upi-id-input').value;
-            if(!upiId || upiId.length < 5 || !upiId.includes('@')) {
-                tele.showAlert("Bhai pehle sahi UPI ID toh daalo!");
-                return;
-            }
-
-            let amt = (type === 'dynamic') ? (withdrawCount + 1) : 10;
-            let cost = amt * 100;
-
-            if(score >= cost) {
-                score -= cost;
-                if(type === 'dynamic') withdrawCount++;
-                
-                // Add to History
-                let now = new Date();
-                history.unshift({
-                    amount: amt,
-                    upi: upiId,
-                    date: now.toLocaleString()
-                });
-
-                updateUI();
-                tele.showAlert(`Bhai ₹${amt} ka withdraw request lag gaya hai!`);
-            } else { tele.showAlert(`Bhai abhi ${cost} coins ki jarurat hai!`); }
-        }
-
+        function resetWithdraw() { document.getElementById('upi-step-1').style.display='block'; document.getElementById('upi-step-2').style.display='none'; cancelUPI(); }
         function openPage(id) { document.querySelectorAll('.sub-page').forEach(p => p.style.display = 'none'); document.getElementById(id).style.display = 'block'; }
         function closeAllPages() { document.querySelectorAll('.sub-page').forEach(p => p.style.display = 'none'); document.getElementById('home-page').style.display = 'flex'; resetWithdraw(); }
 
