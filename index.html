@@ -8,69 +8,70 @@
     <style>
         body { background: #0b0b0b; color: white; font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; overflow: hidden; user-select: none; display: flex; flex-direction: column; align-items: center; }
         
-        /* Stats Container */
-        .stats-container { display: flex; justify-content: space-between; width: 90%; padding: 15px 0; gap: 10px; margin-top: 10px; }
-        .stat-box { background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 12px; flex: 1; }
-        .stat-lvl { font-size: 10px; color: #00ffcc; font-weight: bold; display: block; margin-bottom: 4px; }
-        .stat-label { font-size: 9px; color: #888; text-transform: uppercase; }
-        .stat-val { font-size: 16px; font-weight: bold; color: #ffcc00; }
+        /* Stats & Upgrade Box Combined */
+        .stats-container { display: flex; justify-content: space-between; width: 95%; padding: 10px 0; gap: 8px; margin-top: 5px; }
+        .stat-card { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+        .stat-box { background: #1a1a1a; border: 1px solid #333; border-radius: 10px; padding: 8px; }
+        .stat-lvl { font-size: 9px; color: #00ffcc; font-weight: bold; display: block; }
+        .stat-label { font-size: 8px; color: #888; text-transform: uppercase; }
+        .stat-val { font-size: 14px; font-weight: bold; color: #ffcc00; }
 
-        /* Upgrade Buttons */
-        .upgrade-wrapper { display: flex; justify-content: space-between; width: 90%; gap: 10px; margin-bottom: 15px; }
-        .main-up-btn { background: #1a1a1a; color: #00ffcc; border: 1px solid #333; border-radius: 8px; padding: 12px; flex: 1; cursor: pointer; font-size: 10px; font-weight: bold; text-transform: uppercase; }
+        /* Tiny Upgrade Buttons */
+        .tiny-up-btn { background: #00ffcc; color: #000; border: none; border-radius: 5px; padding: 4px; font-size: 9px; font-weight: bold; cursor: pointer; text-transform: uppercase; width: 100%; }
+        .tiny-up-btn.energy { background: #ffcc00; }
 
-        /* Wallet with Rs Value */
-        .wallet-container { background: rgba(255, 255, 255, 0.03); border: 1px dashed #444; border-radius: 50px; display: flex; flex-direction: column; align-items: center; padding: 10px 30px; margin: 5px auto; }
-        .wallet-main { display: flex; align-items: center; }
-        .wallet-coins { font-size: 28px; font-weight: bold; color: white; margin-left: 10px; }
-        .wallet-value { font-size: 14px; color: #00ffcc; font-weight: bold; margin-top: 2px; }
+        /* Wallet */
+        .wallet-container { background: rgba(255, 255, 255, 0.05); border-radius: 15px; padding: 8px 20px; margin: 10px auto; min-width: 120px; border: 1px solid #222; }
+        .wallet-coins { font-size: 22px; font-weight: bold; display: block; }
+        .wallet-value { font-size: 12px; color: #00ffcc; font-weight: bold; }
 
         /* Centered 3D Coin */
-        .coin-wrapper { flex-grow: 1; display: flex; align-items: center; justify-content: center; width: 100%; margin-bottom: 80px; }
-        #main-tap-coin { width: 220px; height: 220px; background: radial-gradient(circle, #ffe066 0%, #ffcc00 50%, #b38f00 100%); border-radius: 50%; position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 50px rgba(255, 204, 0, 0.5), inset 0 0 20px rgba(255,255,255,0.4); border: 10px solid #cca300; transition: transform 0.1s; }
+        .coin-wrapper { flex-grow: 1; display: flex; align-items: center; justify-content: center; width: 100%; margin-bottom: 60px; }
+        #main-tap-coin { width: 200px; height: 200px; background: radial-gradient(circle, #ffe066 0%, #ffcc00 50%, #b38f00 100%); border-radius: 50%; position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 40px rgba(255, 204, 0, 0.4); border: 8px solid #cca300; transition: transform 0.1s; }
         #main-tap-coin:active { transform: scale(0.92); }
-        #main-tap-coin::before { content: "T"; font-size: 100px; font-weight: bold; color: #b38f00; }
+        #main-tap-coin::before { content: "T"; font-size: 90px; font-weight: bold; color: #b38f00; }
         
-        .plus-one { position: absolute; color: white; font-size: 35px; font-weight: bold; pointer-events: none; animation: fly 0.8s ease-out forwards; z-index: 100; }
-        @keyframes fly { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-150px); } }
+        .plus-one { position: absolute; color: white; font-size: 30px; font-weight: bold; pointer-events: none; animation: fly 0.8s ease-out forwards; z-index: 100; }
+        @keyframes fly { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-130px); } }
 
-        .sub-page { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0b0b; z-index: 1000; padding: 20px; box-sizing: border-box; overflow-y: auto; }
+        /* Sub-Pages */
+        .sub-page { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0b0b; z-index: 1000; padding: 20px; box-sizing: border-box; }
         .upgrade-card { background: #1a1a1a; border: 1px solid #333; border-radius: 15px; padding: 20px; margin-top: 15px; }
-        .buy-btn { background: #00ffcc; color: #000; border: none; padding: 15px; border-radius: 12px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 10px; font-size: 16px; }
+        .buy-btn { background: #00ffcc; color: #000; border: none; padding: 15px; border-radius: 12px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 10px; }
         .back-home { background: #333; color: white; border: none; padding: 10px 20px; border-radius: 8px; margin-top: 20px; cursor: pointer; }
 
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; display: flex; background: #000; padding: 15px 0; border-top: 1px solid #222; }
-        .nav-item { flex: 1; font-size: 12px; color: #666; cursor: pointer; }
+        /* Footer Nav */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; display: flex; background: #000; padding: 12px 0; border-top: 1px solid #222; }
+        .nav-item { flex: 1; font-size: 11px; color: #666; cursor: pointer; }
         .nav-item.active { color: #ffcc00; }
     </style>
 </head>
 <body>
 
     <div id="home-page" style="width:100%; height:100vh; display:flex; flex-direction:column;">
-        <div class="stats-container" style="margin: 10px auto;">
-            <div class="stat-box">
-                <span class="stat-lvl">LVL <span id="home-tap-lvl">1</span></span>
-                <div class="stat-label">Earn per tap</div>
-                <div class="stat-val">+<span id="tap-power-val">1</span></div>
+        <div class="stats-container" style="margin: 5px auto;">
+            <div class="stat-card">
+                <div class="stat-box">
+                    <span class="stat-lvl">LVL <span id="home-tap-lvl">1</span></span>
+                    <div class="stat-label">Earn per tap</div>
+                    <div class="stat-val">+<span id="tap-power-val">1</span></div>
+                </div>
+                <button class="tiny-up-btn" onclick="openPage('upgrade-tap-page')">🚀 Upgrade</button>
             </div>
-            <div class="stat-box">
-                <span class="stat-lvl" style="color:#ffcc00">LVL <span id="home-energy-lvl">1</span></span>
-                <div class="stat-label">Energy</div>
-                <div class="stat-val"><span id="current-energy">10</span>/<span id="max-energy">10</span></div>
-            </div>
-        </div>
 
-        <div class="upgrade-wrapper" style="margin: 0 auto; width: 90%;">
-            <button class="main-up-btn" onclick="openPage('upgrade-tap-page')">🚀 Upgrade Tap</button>
-            <button class="main-up-btn" onclick="openPage('upgrade-energy-page')" style="color:#ffcc00">⚡ Upgrade Energy</button>
+            <div class="stat-card">
+                <div class="stat-box">
+                    <span class="stat-lvl" style="color:#ffcc00">LVL <span id="home-energy-lvl">1</span></span>
+                    <div class="stat-label">Energy</div>
+                    <div class="stat-val"><span id="current-energy">10</span>/<span id="max-energy">10</span></div>
+                </div>
+                <button class="tiny-up-btn energy" onclick="openPage('upgrade-energy-page')">⚡ Upgrade</button>
+            </div>
         </div>
 
         <div class="wallet-container">
-            <div class="wallet-main">
-                <div style="width:20px; height:20px; background:#ffcc00; border-radius:50%; border:2px solid #b38f00;"></div>
-                <span class="wallet-coins" id="total-coins">0</span>
-            </div>
-            <div class="wallet-value">≈ ₹<span id="rs-value">0.00</span></div>
+            <span class="wallet-coins" id="total-coins">0</span>
+            <span class="wallet-value">₹<span id="rs-value">0.00</span></span>
         </div>
 
         <div class="coin-wrapper">
@@ -86,8 +87,8 @@
     <div id="upgrade-tap-page" class="sub-page">
         <h2 style="color:#00ffcc">Tap Power Upgrade</h2>
         <div class="upgrade-card">
-            <p>Abhi ka Level: <span id="tap-lvl-display">1</span></p>
-            <h3 id="tap-cost-display">200 Coins</h3>
+            <p>Abhi Level: <span id="tap-lvl-display">1</span></p>
+            <h3 id="tap-cost-display">200 Coins Ki Jarurat Hai</h3>
             <button class="buy-btn" onclick="buyTapUpgrade()">UPGRADE KARO</button>
         </div>
         <button class="back-home" onclick="closeAllPages()">Piche Jao</button>
@@ -96,8 +97,8 @@
     <div id="upgrade-energy-page" class="sub-page">
         <h2 style="color:#ffcc00">Energy Upgrade</h2>
         <div class="upgrade-card">
-            <p>Abhi ka Level: <span id="energy-lvl-display">1</span></p>
-            <h3 id="energy-cost-display">100 Coins</h3>
+            <p>Abhi Level: <span id="energy-lvl-display">1</span></p>
+            <h3 id="energy-cost-display">100 Coins Ki Jarurat Hai</h3>
             <button class="buy-btn" onclick="buyEnergyUpgrade()">UPGRADE KARO</button>
         </div>
         <button class="back-home" onclick="closeAllPages()">Piche Jao</button>
