@@ -18,14 +18,15 @@
         #tap-coin { width: 200px; height: 200px; background: radial-gradient(circle, #ffe066 0%, #ffcc00 50%, #b38f00 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 40px rgba(255, 204, 0, 0.3); border: 10px solid #cca300; cursor: pointer; transition: transform 0.05s; }
         #tap-coin:active { transform: scale(0.92); }
         #tap-coin::before { content: "T"; font-size: 80px; font-weight: bold; color: #b38f00; }
-        .plus-one { position: absolute; color: white; font-size: 30px; font-weight: bold; pointer-events: none; animation: fly 0.6s forwards; }
+        .plus-one { position: absolute; color: white; font-size: 30px; font-weight: bold; pointer-events: none; animation: fly 0.6s forwards; z-index: 100; }
         @keyframes fly { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-120px); } }
         .bottom-nav { position: fixed; bottom: 0; width: 100%; display: flex; background: #000; padding: 12px 0; border-top: 1px solid #222; }
         .nav-item { flex: 1; font-size: 12px; color: #666; cursor: pointer; }
-        .page { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0b0b; z-index: 1000; padding: 20px; box-sizing: border-box; }
+        .page { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0b0b; z-index: 1000; padding: 20px; box-sizing: border-box; overflow-y: auto; }
         .page-card { background: #1a1a1a; padding: 15px; border-radius: 15px; border: 1px solid #333; margin-top: 15px; text-align: left; }
         .buy-now { background: #00ffcc; color: #000; border: none; width: 100%; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #000; color: #fff; margin-bottom: 10px; box-sizing: border-box; }
+        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #000; color: #fff; box-sizing: border-box; outline: none; }
+        .hist-item { background: #111; padding: 8px; border-radius: 8px; margin-top: 5px; border-left: 3px solid #ffcc00; font-size: 12px; }
     </style>
 </head>
 <body>
@@ -51,7 +52,7 @@
 </div>
 
 <div id="p-tap" class="page">
-    <h2>Upgrade Tap</h2>
+    <h2>Upgrade Tap Power</h2>
     <div class="page-card"><p>Level: <span id="pt-lvl">1</span></p><h3 id="pt-cost">Cost: 100</h3><button class="buy-now" onclick="up('tap')">BUY UPGRADE</button></div>
     <button onclick="closeP()" style="margin-top:20px; color:gray; background:none; border:none;">← Back</button>
 </div>
@@ -63,22 +64,27 @@
 </div>
 
 <div id="p-wd" class="page">
-    <h2>Withdrawal</h2>
-    <input type="text" id="upi" placeholder="Enter UPI ID">
+    <h2 style="color:#00ffcc">Withdrawal</h2>
+    <input type="text" id="upi" placeholder="Enter UPI ID (name@apl)">
     <div class="page-card">
-        <h4>1. Progressive Option</h4>
+        <h4 style="margin:0">1. Progressive</h4>
         <button class="buy-now" onclick="wd('prog')">Withdraw ₹<span id="prog-v">1</span></button>
     </div>
     <div class="page-card">
-        <h4>2. Always High Option</h4>
+        <h4 style="margin:0">2. Always High</h4>
         <button class="buy-now" style="background:#ffcc00" onclick="wd('always')">Withdraw ₹<span id="alw-v">10</span></button>
     </div>
-    <button onclick="closeP()" style="margin-top:20px; color:gray; background:none; border:none;">← Back</button>
+    <div style="text-align:left; margin-top:20px;">
+        <h4 style="border-bottom:1px solid #333; padding-bottom:5px;">History</h4>
+        <div id="hist-list"></div>
+    </div>
+    <button onclick="closeP()" style="margin-top:20px; color:gray; background:none; border:none; margin-bottom:40px;">← Back</button>
 </div>
 
 <script>
     let tg = window.Telegram.WebApp; tg.expand();
     let s = parseInt(localStorage.getItem('s'))||0, tl = parseInt(localStorage.getItem('tl'))||1, el = parseInt(localStorage.getItem('el'))||1, wl = parseInt(localStorage.getItem('wl'))||1;
+    let hi = JSON.parse(localStorage.getItem('hi'))||[];
     let me = el*100, ce = parseInt(localStorage.getItem('ce'))||me;
 
     function upd() {
@@ -88,7 +94,11 @@
         document.getElementById('pt-lvl').innerText = tl; document.getElementById('pt-cost').innerText = "Cost: "+(tl*100);
         document.getElementById('pe-lvl').innerText = el; document.getElementById('pe-cost').innerText = "Cost: "+(el*100);
         document.getElementById('prog-v').innerText = wl; document.getElementById('alw-v').innerText = wl+9;
-        localStorage.setItem('s',s); localStorage.setItem('tl',tl); localStorage.setItem('el',el); localStorage.setItem('ce',ce); localStorage.setItem('wl',wl);
+        
+        let hl = document.getElementById('hist-list');
+        hl.innerHTML = hi.length ? hi.map(item => `<div class="hist-item"><b>₹${item.amt}</b> - ${item.status}<br><small>${item.date}</small></div>`).join('') : '<small style="color:#444">No history yet</small>';
+
+        localStorage.setItem('s',s); localStorage.setItem('tl',tl); localStorage.setItem('el',el); localStorage.setItem('ce',ce); localStorage.setItem('wl',wl); localStorage.setItem('hi', JSON.stringify(hi));
     }
 
     document.getElementById('tap-coin').onclick = (e) => {
@@ -102,15 +112,18 @@
 
     function up(t) {
         let c = (t==='tap'?tl:el)*100;
-        if(s >= c) { s-=c; if(t==='tap') tl++; else {el++; me=el*100; ce=me;} upd(); }
+        if(s >= c) { s-=c; if(t==='tap') tl++; else {el++; me=el*100; ce=me;} upd(); tg.showAlert("Upgrade Successful!"); }
         else tg.showAlert("Low coins!");
     }
 
     function wd(t) {
-        let u = document.getElementById('upi').value; if(!u.includes('@')) return tg.showAlert("UPI ID?");
+        let u = document.getElementById('upi').value; if(!u.includes('@')) return tg.showAlert("UPI ID sahi dalo!");
         let v = (t==='prog')?wl:(wl+9);
-        if(s >= v*100) { s-=v*100; if(t==='prog') wl++; upd(); tg.showAlert("Sent ₹"+v); }
-        else tg.showAlert("Low coins!");
+        if(s >= v*100) { 
+            s-=v*100; if(t==='prog') wl++; 
+            hi.unshift({amt: v, status: 'PENDING', date: new Date().toLocaleDateString()});
+            upd(); tg.showAlert("Sent ₹"+v); 
+        } else tg.showAlert("Low coins!");
     }
 
     function openP(id) { document.querySelectorAll('.page').forEach(p=>p.style.display='none'); document.getElementById(id).style.display='block'; }
