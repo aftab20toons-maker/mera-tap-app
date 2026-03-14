@@ -26,7 +26,10 @@
         .page-card { background: #1a1a1a; padding: 15px; border-radius: 15px; border: 1px solid #333; margin-top: 15px; text-align: left; }
         .buy-now { background: #00ffcc; color: #000; border: none; width: 100%; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #000; color: #fff; box-sizing: border-box; outline: none; }
-        .hist-item { background: #111; padding: 8px; border-radius: 8px; margin-top: 5px; border-left: 3px solid #ffcc00; font-size: 12px; }
+        .hist-item { background: #111; padding: 12px; border-radius: 10px; margin-top: 10px; border-left: 4px solid #ffcc00; }
+        .status-txt { font-weight: bold; font-size: 14px; }
+        .note-pending { font-size: 10px; color: #aaa; margin-top: 5px; font-style: italic; }
+        .note-success { font-size: 11px; color: #00ffcc; margin-top: 5px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -74,11 +77,11 @@
         <h4 style="margin:0">2. Always High</h4>
         <button class="buy-now" style="background:#ffcc00" onclick="wd('always')">Withdraw ₹<span id="alw-v">10</span></button>
     </div>
-    <div style="text-align:left; margin-top:20px;">
-        <h4 style="border-bottom:1px solid #333; padding-bottom:5px;">History</h4>
+    <div style="text-align:left; margin-top:20px; padding-bottom:100px;">
+        <h4 style="border-bottom:1px solid #333; padding-bottom:5px;">Withdrawal History</h4>
         <div id="hist-list"></div>
     </div>
-    <button onclick="closeP()" style="margin-top:20px; color:gray; background:none; border:none; margin-bottom:40px;">← Back</button>
+    <button onclick="closeP()" style="position:fixed; bottom:20px; left:50%; transform:translateX(-50%); color:gray; background:#000; padding:10px 30px; border-radius:10px; border:1px solid #333;">← Back</button>
 </div>
 
 <script>
@@ -96,7 +99,19 @@
         document.getElementById('prog-v').innerText = wl; document.getElementById('alw-v').innerText = wl+9;
         
         let hl = document.getElementById('hist-list');
-        hl.innerHTML = hi.length ? hi.map(item => `<div class="hist-item"><b>₹${item.amt}</b> - ${item.status}<br><small>${item.date}</small></div>`).join('') : '<small style="color:#444">No history yet</small>';
+        hl.innerHTML = hi.length ? hi.map(item => `
+            <div class="hist-item">
+                <div style="display:flex; justify-content:space-between;">
+                    <b>₹${item.amt}</b>
+                    <span class="status-txt" style="color:${item.status==='SUCCESS'?'#00ffcc':'#ffcc00'}">${item.status}</span>
+                </div>
+                ${item.status === 'PENDING' ? 
+                    `<div class="note-pending">Tension na lo, 20 mint se 2 mnt ke beech payment ho jayega.</div>` : 
+                    `<div class="note-success">Congratulation! First payment mil gaya ab tap ko aur energy upgrade karo.</div>`
+                }
+                <small style="color:#555; font-size:9px;">${item.date}</small>
+            </div>
+        `).join('') : '<small style="color:#444">No history yet</small>';
 
         localStorage.setItem('s',s); localStorage.setItem('tl',tl); localStorage.setItem('el',el); localStorage.setItem('ce',ce); localStorage.setItem('wl',wl); localStorage.setItem('hi', JSON.stringify(hi));
     }
@@ -121,8 +136,10 @@
         let v = (t==='prog')?wl:(wl+9);
         if(s >= v*100) { 
             s-=v*100; if(t==='prog') wl++; 
-            hi.unshift({amt: v, status: 'PENDING', date: new Date().toLocaleDateString()});
-            upd(); tg.showAlert("Sent ₹"+v); 
+            hi.unshift({amt: v, status: 'PENDING', date: new Date().toLocaleString()});
+            upd(); tg.showAlert("Request Sent!"); 
+            // Demo for testing success after 5 seconds (aap ise admin se control karenge real me)
+            /* setTimeout(() => { hi[0].status = 'SUCCESS'; upd(); }, 5000); */
         } else tg.showAlert("Low coins!");
     }
 
