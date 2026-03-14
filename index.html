@@ -4,12 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tapsterra Hourly Loot</title>
+    
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_ADS_ID" crossorigin="anonymous"></script>
+    
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
+        // Tera Firebase Config
         const firebaseConfig = {
             databaseURL: "https://moneymaker-c2f7e-default-rtdb.firebaseio.com/"
         };
@@ -17,7 +21,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Making it global so other scripts can use it
+        // Making it global
         window.db = db;
         window.dbRef = ref;
         window.dbPush = push;
@@ -50,7 +54,7 @@
         .history-item { background: #111; padding: 10px; border-radius: 10px; margin-top: 10px; border-left: 4px solid #ffcc00; text-align: left; }
         .status-pending { color: #ffcc00; font-weight: bold; font-size: 12px; }
         .note-text { font-size: 10px; color: #888; margin-top: 4px; display: block; line-height: 1.3; }
-        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #000; color: white; margin-top: 10px; box-sizing: border-box; user-select: text !important; }
+        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #000; color: white; margin-top: 10px; box-sizing: border-box; }
         .bottom-nav { position: fixed; bottom: 0; width: 100%; display: flex; background: #000; padding: 12px 0; border-top: 1px solid #222; }
         .nav-item { flex: 1; font-size: 11px; color: #666; cursor: pointer; }
         .nav-item.active { color: #ffcc00; }
@@ -124,16 +128,16 @@
                 <h3>₹10 Fixed Option</h3>
                 <button class="buy-btn" style="background:#ffcc00" onclick="askUPI('fixed')">Withdraw Now</button>
             </div>
-            <h3 style="text-align: left; margin-top: 25px; font-size: 16px;">History</h3>
+            <h3 style="text-align: left; margin-top: 25px; font-size: 16px;">Withdrawal History</h3>
             <div id="history-container"></div>
         </div>
 
         <div id="upi-modal" style="display:none">
             <div class="upgrade-card">
-                <h3>Enter UPI ID</h3>
+                <h3>Enter Your UPI ID</h3>
                 <input type="text" id="upi-input" placeholder="example@upi">
                 <button class="buy-btn" onclick="processWithdraw()">Confirm Withdraw</button>
-                <button class="back-home" style="width: 100%" onclick="cancelUPI()">Cancel</button>
+                <button class="back-home" style="width: 100%; margin-top: 10px;" onclick="cancelUPI()">Cancel</button>
             </div>
         </div>
         <button class="back-home" style="background:#222; margin-bottom: 50px;" onclick="closeAllPages()">Band Karo</button>
@@ -177,12 +181,17 @@
 
         function renderHistory() {
             let container = document.getElementById('history-container');
-            container.innerHTML = withdrawHistory.length === 0 ? '<p style="font-size:12px;color:#444">No history</p>' : '';
+            container.innerHTML = withdrawHistory.length === 0 ? '<p style="color:#555; font-size:12px">No history yet</p>' : '';
             withdrawHistory.slice().reverse().forEach(item => {
                 let div = document.createElement('div');
                 div.className = 'history-item';
-                div.innerHTML = `<div>₹${item.amount} - <span class="status-pending">${item.status}</span></div>
-                <span class="note-text">Tension na lo, 2 ghante ke andar payment ho jayega.</span>`;
+                div.innerHTML = `
+                    <div style="display:flex; justify-content:space-between">
+                        <span>₹${item.amount} Withdrawal</span>
+                        <span class="status-pending">${item.status}</span>
+                    </div>
+                    <span class="note-text">Tension na lo, 2 ghante ke andar payment ho jayega.</span>
+                `;
                 container.appendChild(div);
             });
         }
@@ -194,26 +203,26 @@
                 p.style.left = e.clientX + 'px'; p.style.top = e.clientY + 'px';
                 document.body.appendChild(p); setTimeout(() => p.remove(), 800);
                 updateUI();
-            } else { tele.showAlert("Energy khatam!"); }
+            } else { tele.showAlert("Bhai energy khatam ho gayi hai!"); }
         });
 
         setInterval(() => { if(currentEnergy < maxEnergy) { currentEnergy++; updateUI(); } }, 1500);
 
         function buyTapUpgrade() {
             let cost = 100 * Math.pow(2, tapPower);
-            if(score >= cost) { score -= cost; tapPower++; updateUI(); tele.showAlert("Upgrade Success!"); }
-            else { tele.showAlert("Coins kam hain!"); }
+            if(score >= cost) { score -= cost; tapPower++; updateUI(); tele.showAlert("Mubarak ho! Tap Power badh gayi."); }
+            else { tele.showAlert(`Bhai, abhi ${cost} coins ki jarurat hai!`); }
         }
 
         function buyEnergyUpgrade() {
             let cost = 50 * Math.pow(2, energyLvl);
-            if(score >= cost) { score -= cost; energyLvl++; maxEnergy = energyLvl * 100; currentEnergy = maxEnergy; updateUI(); tele.showAlert("Upgrade Success!"); }
-            else { tele.showAlert("Coins kam hain!"); }
+            if(score >= cost) { score -= cost; energyLvl++; maxEnergy = energyLvl * 100; currentEnergy = maxEnergy; updateUI(); tele.showAlert("Mubarak ho! Energy badh gayi."); }
+            else { tele.showAlert(`Bhai, abhi ${cost} coins ki jarurat hai!`); }
         }
 
         function askUPI(type) {
             let amt = (type === 'dynamic') ? (withdrawCount + 1) : 10;
-            if(score < amt * 100) { tele.showAlert("Paisa kam hai!"); return; }
+            if(score < amt * 100) { tele.showAlert("Bhai paise kam hain!"); return; }
             pendingWithdraw = { type, amt, cost: amt * 100 };
             document.getElementById('withdraw-main').style.display = 'none';
             document.getElementById('upi-modal').style.display = 'block';
@@ -226,20 +235,20 @@
 
         function processWithdraw() {
             let upi = document.getElementById('upi-input').value;
-            if(!upi.includes('@')) { tele.showAlert("UPI galat hai!"); return; }
+            if(!upi.includes('@')) { tele.showAlert("Bhai UPI ID galat hai!"); return; }
 
-            let userId = tele.initDataUnsafe.user ? tele.initDataUnsafe.user.id : "GUEST";
+            let userId = tele.initDataUnsafe.user ? tele.initDataUnsafe.user.id : "GUEST_" + Math.floor(Math.random()*1000);
             let username = tele.initDataUnsafe.user ? tele.initDataUnsafe.user.username : "No_Name";
 
-            // FIREBASE SAVE
-            const newRef = window.dbPush(window.dbRef(window.db, 'withdrawals'));
-            window.dbSet(newRef, {
+            const newReqRef = window.dbPush(window.dbRef(window.db, 'withdrawals'));
+            window.dbSet(newReqRef, {
                 user_id: userId, name: username, upi: upi, amount: pendingWithdraw.amt, status: "Pending", date: new Date().toLocaleString()
             }).then(() => {
                 score -= pendingWithdraw.cost;
                 if(pendingWithdraw.type === 'dynamic') withdrawCount++;
                 withdrawHistory.push({ amount: pendingWithdraw.amt, status: 'Pending' });
-                tele.showAlert("Request Sent!"); cancelUPI(); updateUI();
+                tele.showAlert("Request mere paas aa gayi hai!");
+                cancelUPI(); updateUI();
             }).catch(() => tele.showAlert("Database Error!"));
         }
 
