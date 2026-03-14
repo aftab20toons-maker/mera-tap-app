@@ -6,45 +6,53 @@
     <title>Tapsterra Hourly Loot</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { background: #0b0b0b; color: white; font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; display: flex; flex-direction: column; align-items: center; height: 100vh; overflow: hidden; }
+        body { background: #0b0b0b; color: white; font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; display: flex; flex-direction: column; align-items: center; height: 100vh; overflow: hidden; user-select: none; }
         
-        /* Stats */
-        .stats-container { display: flex; justify-content: space-between; width: 90%; margin-top: 15px; gap: 10px; }
-        .stat-box { flex: 1; background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 10px; }
-        .stat-lvl { font-size: 10px; color: #00ffcc; font-weight: bold; }
-        .stat-val { font-size: 18px; font-weight: bold; color: #ffcc00; margin-top: 5px; }
-        .stat-label { font-size: 8px; color: #888; text-transform: uppercase; display: block; }
+        /* Stats Header */
+        .stats-container { display: flex; justify-content: space-between; width: 92%; margin-top: 10px; gap: 10px; }
+        .stat-box { flex: 1; background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 12px; height: 85px; display: flex; flex-direction: column; justify-content: center; }
+        .stat-lvl { font-size: 11px; color: #00ffcc; font-weight: bold; }
+        .stat-val { font-size: 20px; font-weight: bold; color: #ffcc00; margin: 4px 0; }
+        .stat-label { font-size: 9px; color: #888; text-transform: uppercase; }
 
-        /* Buttons */
-        .upgrade-row { display: flex; justify-content: space-between; width: 90%; margin-top: 10px; gap: 10px; }
-        .up-btn { flex: 1; background: #1a1a1a; color: #00ffcc; border: 1px solid #333; border-radius: 8px; padding: 10px; font-size: 10px; font-weight: bold; cursor: pointer; }
-        .up-btn.energy { color: #ffcc00; }
+        /* Action Upgrade Buttons */
+        .action-row { display: flex; justify-content: space-between; width: 92%; margin-top: 12px; gap: 10px; }
+        .action-btn { flex: 1; background: #1a1a1a; color: #00ffcc; border: 1px solid #333; border-radius: 10px; padding: 14px; font-size: 11px; font-weight: bold; cursor: pointer; text-transform: uppercase; z-index: 5; }
+        .action-btn.energy { color: #ffcc00; }
 
-        /* Wallet */
-        .wallet-box { background: rgba(255, 255, 255, 0.05); border-radius: 50px; padding: 10px 20px; margin: 20px auto; display: flex; align-items: center; gap: 10px; border: 1px dashed #444; }
-        .wallet-coins { font-size: 24px; font-weight: bold; }
-        .wallet-rs { font-size: 16px; color: #00ffcc; border-left: 1px solid #444; padding-left: 10px; }
+        /* Balance Section */
+        .balance-container { background: rgba(255, 255, 255, 0.05); border-radius: 50px; padding: 12px 25px; margin: 20px auto; display: flex; align-items: center; gap: 12px; border: 1px dashed #444; }
+        .coin-txt { font-size: 26px; font-weight: bold; }
+        .rs-txt { font-size: 18px; color: #00ffcc; font-weight: bold; border-left: 1px solid #444; padding-left: 12px; }
 
-        /* Coin */
-        .coin-area { flex-grow: 1; display: flex; align-items: center; justify-content: center; }
-        #main-tap-coin { width: 200px; height: 200px; background: radial-gradient(circle, #ffe066 0%, #ffcc00 50%, #b38f00 100%); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 40px rgba(255, 204, 0, 0.3); border: 10px solid #cca300; transition: transform 0.05s; }
-        #main-tap-coin:active { transform: scale(0.95); }
-        #main-tap-coin::before { content: "T"; font-size: 90px; font-weight: bold; color: #b38f00; }
+        /* PERFECT CIRCLE COIN */
+        .coin-wrap { flex-grow: 1; display: flex; align-items: center; justify-content: center; width: 100%; margin-bottom: 70px; }
+        #tap-coin { 
+            width: 210px; height: 210px; 
+            background: radial-gradient(circle, #ffe066 0%, #ffcc00 50%, #b38f00 100%); 
+            border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            box-shadow: 0 0 50px rgba(255, 204, 0, 0.3); 
+            border: 12px solid #cca300; 
+            cursor: pointer; transition: transform 0.05s;
+        }
+        #tap-coin:active { transform: scale(0.92); }
+        #tap-coin::before { content: "T"; font-size: 100px; font-weight: bold; color: #b38f00; }
 
-        /* Plus One Animation */
-        .plus-one { position: absolute; color: white; font-size: 28px; font-weight: bold; animation: fly 0.6s ease-out forwards; pointer-events: none; z-index: 100; }
-        @keyframes fly { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-120px); } }
+        /* Floating +1 Animation */
+        .plus-one { position: absolute; color: white; font-size: 32px; font-weight: bold; pointer-events: none; animation: fly 0.6s ease-out forwards; z-index: 100; }
+        @keyframes fly { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-140px); } }
 
-        /* Navigation */
-        .nav-bar { position: fixed; bottom: 0; width: 100%; display: flex; background: #000; padding: 12px 0; border-top: 1px solid #222; }
-        .nav-item { flex: 1; font-size: 12px; color: #666; cursor: pointer; }
+        /* Bottom Nav */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; display: flex; background: #000; padding: 15px 0; border-top: 1px solid #222; }
+        .nav-item { flex: 1; font-size: 12px; color: #666; cursor: pointer; font-weight: bold; }
         .nav-item.active { color: #ffcc00; }
 
         /* Pages */
-        .sub-page { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0b0b; padding: 20px; box-sizing: border-box; z-index: 1000; }
-        .card { background: #1a1a1a; padding: 20px; border-radius: 15px; border: 1px solid #333; margin-top: 20px; }
-        .buy-btn { background: #00ffcc; color: #000; border: none; width: 100%; padding: 15px; border-radius: 10px; font-weight: bold; margin-top: 15px; cursor: pointer; }
-        .back-btn { background: #333; color: white; border: none; padding: 10px 20px; border-radius: 8px; margin-top: 20px; cursor: pointer; }
+        .page { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0b0b; z-index: 1000; padding: 25px; box-sizing: border-box; }
+        .page-card { background: #1a1a1a; padding: 25px; border-radius: 20px; border: 1px solid #333; margin-top: 30px; }
+        .buy-now { background: #00ffcc; color: #000; border: none; width: 100%; padding: 18px; border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 20px; }
+        .back-btn { background: #333; color: white; border: none; padding: 10px 25px; border-radius: 10px; margin-top: 30px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -52,156 +60,116 @@
     <div id="home-page" style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center;">
         <div class="stats-container">
             <div class="stat-box">
-                <span class="stat-lvl">LVL <span id="tap-lvl-disp">1</span></span>
-                <div class="stat-val">+<span id="tap-val-disp">1</span></div>
-                <span class="stat-label">Earn per tap</span>
+                <span class="stat-lvl">LVL <span id="h-tap-lvl">1</span></span>
+                <div class="stat-val">+<span id="h-tap-val">1</span></div>
+                <span class="stat-label">Per Tap</span>
             </div>
             <div class="stat-box">
-                <span class="stat-lvl" style="color:#ffcc00">LVL <span id="eng-lvl-disp">1</span></span>
+                <span class="stat-lvl" style="color:#ffcc00">LVL <span id="h-eng-lvl">1</span></span>
                 <div class="stat-val"><span id="curr-e">100</span>/<span id="max-e">100</span></div>
                 <span class="stat-label">Energy</span>
             </div>
         </div>
 
-        <div class="upgrade-row">
-            <button class="up-btn" onclick="openPage('upgrade-tap')">🚀 UPGRADE TAP</button>
-            <button class="up-btn energy" onclick="openPage('upgrade-energy')">⚡ UPGRADE ENERGY</button>
+        <div class="action-row">
+            <div class="action-btn" onclick="showPage('page-tap')">🚀 Upgrade Tap</div>
+            <div class="action-btn energy" onclick="showPage('page-eng')">⚡ Upgrade Energy</div>
         </div>
 
-        <div class="wallet-box">
-            <span class="wallet-coins">🟡 <span id="score">0</span></span>
-            <span class="wallet-rs">≈ ₹<span id="rs">0.00</span></span>
+        <div class="balance-container">
+            <span class="coin-txt">🟡 <span id="score">0</span></span>
+            <span class="rs-txt">≈ ₹<span id="rs">0.00</span></span>
         </div>
 
-        <div class="coin-area">
-            <div id="main-tap-coin"></div>
+        <div class="coin-wrap">
+            <div id="tap-coin"></div>
         </div>
 
-        <div class="nav-bar">
-            <div class="nav-item active" onclick="closePages()">🏠 Home</div>
-            <div class="nav-item" onclick="openPage('withdraw-page')">💰 Withdraw</div>
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="hidePages()">🏠 Home</div>
+            <div class="nav-item" onclick="showPage('page-withdraw')">💰 Withdraw</div>
         </div>
     </div>
 
-    <div id="upgrade-tap" class="sub-page">
+    <div id="page-tap" class="page">
         <h2>Upgrade Tap Power</h2>
-        <div class="card">
-            <p>Current Level: <span id="u-tap-lvl">1</span></p>
-            <h3 id="u-tap-cost">Cost: 100 Coins</h3>
-            <button class="buy-btn" onclick="buyTap()">UPGRADE NOW</button>
+        <div class="page-card">
+            <p>Current Level: <span id="p-tap-lvl">1</span></p>
+            <h3 id="p-tap-cost">Cost: 100 Coins</h3>
+            <button class="buy-now" onclick="upgrade('tap')">UPGRADE NOW</button>
         </div>
-        <button class="back-btn" onclick="closePages()">← Back</button>
+        <button class="back-btn" onclick="hidePages()">Back</button>
     </div>
 
-    <div id="upgrade-energy" class="sub-page">
-        <h2 style="color:#ffcc00">Upgrade Max Energy</h2>
-        <div class="card">
-            <p>Current Level: <span id="u-eng-lvl">1</span></p>
-            <h3 id="u-eng-cost">Cost: 100 Coins</h3>
-            <button class="buy-btn" style="background:#ffcc00" onclick="buyEnergy()">UPGRADE NOW</button>
+    <div id="page-eng" class="page">
+        <h2 style="color:#ffcc00">Max Energy</h2>
+        <div class="page-card">
+            <p>Current Level: <span id="p-eng-lvl">1</span></p>
+            <h3 id="p-eng-cost">Cost: 100 Coins</h3>
+            <button class="buy-now" style="background:#ffcc00" onclick="upgrade('eng')">UPGRADE NOW</button>
         </div>
-        <button class="back-btn" onclick="closePages()">← Back</button>
+        <button class="back-btn" onclick="hidePages()">Back</button>
     </div>
 
-    <div id="withdraw-page" class="sub-page">
-        <h2 style="color:#00ffcc">Withdraw</h2>
-        <div class="card">
-            <input type="text" id="upi-id" placeholder="Enter UPI ID" style="width:100%; padding:12px; border-radius:8px; border:none; margin-bottom:15px; box-sizing:border-box;">
-            <button class="buy-btn" onclick="requestWithdraw()">SUBMIT REQUEST</button>
+    <div id="page-withdraw" class="page">
+        <h2>Withdrawal</h2>
+        <div class="page-card">
+            <input type="text" id="upi-val" placeholder="UPI ID" style="width:100%; padding:15px; border-radius:10px; border:none; margin-bottom:15px; background:#000; color:#fff;">
+            <button class="buy-now" onclick="withdraw()">SUBMIT</button>
         </div>
-        <div id="history" style="text-align:left; margin-top:20px;">
-            <h3>History</h3>
-            <div id="hist-list" style="font-size:12px; color:#888;">No history yet.</div>
-        </div>
-        <button class="back-btn" onclick="closePages()">← Back</button>
+        <button class="back-btn" onclick="hidePages()">Back</button>
     </div>
 
     <script>
-        let tele = window.Telegram.WebApp;
-        tele.expand();
+        let tele = window.Telegram.WebApp; tele.expand();
+        let score = parseInt(localStorage.getItem('sc')) || 0;
+        let tLvl = parseInt(localStorage.getItem('tl')) || 1;
+        let eLvl = parseInt(localStorage.getItem('el')) || 1;
+        let maxE = eLvl * 100;
+        let curE = parseInt(localStorage.getItem('ce')) || maxE;
 
-        let score = parseInt(localStorage.getItem('score')) || 0;
-        let tapLvl = parseInt(localStorage.getItem('tapLvl')) || 1;
-        let engLvl = parseInt(localStorage.getItem('engLvl')) || 1;
-        let history = JSON.parse(localStorage.getItem('history')) || [];
-        
-        let maxE = engLvl * 100;
-        let currE = parseInt(localStorage.getItem('currE')) || maxE;
-
-        function updateUI() {
+        function update() {
             document.getElementById('score').innerText = score;
             document.getElementById('rs').innerText = (score/100).toFixed(2);
-            document.getElementById('tap-lvl-disp').innerText = tapLvl;
-            document.getElementById('tap-val-disp').innerText = tapLvl;
-            document.getElementById('eng-lvl-disp').innerText = engLvl;
-            document.getElementById('curr-e').innerText = currE;
+            document.getElementById('h-tap-lvl').innerText = tLvl;
+            document.getElementById('h-tap-val').innerText = tLvl;
+            document.getElementById('h-eng-lvl').innerText = eLvl;
+            document.getElementById('curr-e').innerText = curE;
             document.getElementById('max-e').innerText = maxE;
+            document.getElementById('p-tap-lvl').innerText = tLvl;
+            document.getElementById('p-tap-cost').innerText = "Cost: " + (tLvl*100) + " Coins";
+            document.getElementById('p-eng-lvl').innerText = eLvl;
+            document.getElementById('p-eng-cost').innerText = "Cost: " + (eLvl*100) + " Coins";
             
-            // Update Upgrade Pages
-            document.getElementById('u-tap-lvl').innerText = tapLvl;
-            document.getElementById('u-tap-cost').innerText = "Cost: " + (tapLvl * 100) + " Coins";
-            document.getElementById('u-eng-lvl').innerText = engLvl;
-            document.getElementById('u-eng-cost').innerText = "Cost: " + (engLvl * 100) + " Coins";
-
-            const list = document.getElementById('hist-list');
-            if(history.length > 0) {
-                list.innerHTML = history.map(h => `
-                    <div style="background:#111; padding:10px; border-radius:8px; margin-bottom:10px; border-left:4px solid ${h.status==='SUCCESS'?'#00ffcc':'#ffcc00'}">
-                        <b>₹${h.amt}</b> - ${h.status} <br>
-                        <small style="color:#555">${h.date}</small>
-                        <p style="font-size:10px; margin-top:5px; color:#888;">${h.status==='SUCCESS'?'Mubarak ho! Payment mil gaya.':'Bhai tension na le, 2-10 ghante me mil jayega.'}</p>
-                    </div>
-                `).join('');
-            }
-
-            localStorage.setItem('score', score);
-            localStorage.setItem('tapLvl', tapLvl);
-            localStorage.setItem('engLvl', engLvl);
-            localStorage.setItem('currE', currE);
-            localStorage.setItem('history', JSON.stringify(history));
+            localStorage.setItem('sc', score); localStorage.setItem('tl', tLvl);
+            localStorage.setItem('el', eLvl); localStorage.setItem('ce', curE);
         }
 
-        document.getElementById('main-tap-coin').addEventListener('click', (e) => {
-            if(currE > 0) {
-                score += tapLvl; currE--;
-                let p = document.createElement('div');
-                p.innerText = "+" + tapLvl; p.className = 'plus-one';
-                p.style.left = e.clientX + 'px'; p.style.top = e.clientY + 'px';
-                document.body.appendChild(p);
-                setTimeout(() => p.remove(), 600);
-                updateUI();
-            } else { tele.showAlert("Energy khatam! Wait karo."); }
-        });
+        document.getElementById('tap-coin').onclick = (e) => {
+            if(curE > 0) {
+                score += tLvl; curE--;
+                let p = document.createElement('div'); p.className='plus-one'; p.innerText="+"+tLvl;
+                p.style.left=e.clientX+'px'; p.style.top=e.clientY+'px';
+                document.body.appendChild(p); setTimeout(()=>p.remove(), 600);
+                update();
+            } else { tele.showAlert("No Energy!"); }
+        };
 
-        function buyTap() {
-            let cost = tapLvl * 100;
-            if(score >= cost) { score -= cost; tapLvl++; updateUI(); tele.showAlert("Tap Power Upgraded!"); }
-            else { tele.showAlert("Coins kam hain!"); }
+        function upgrade(type) {
+            let cost = (type==='tap' ? tLvl : eLvl) * 100;
+            if(score >= cost) {
+                score -= cost;
+                if(type==='tap') tLvl++; else { eLvl++; maxE=eLvl*100; curE=maxE; }
+                update(); tele.showAlert("Upgraded!");
+            } else { tele.showAlert("Coins low!"); }
         }
 
-        function buyEnergy() {
-            let cost = engLvl * 100;
-            if(score >= cost) { score -= cost; engLvl++; maxE = engLvl * 100; currE = maxE; updateUI(); tele.showAlert("Energy Upgraded!"); }
-            else { tele.showAlert("Coins kam hain!"); }
-        }
+        function showPage(id) { document.getElementById(id).style.display='block'; }
+        function hidePages() { document.querySelectorAll('.page').forEach(p=>p.style.display='none'); }
+        function withdraw() { tele.showAlert("Request Sent!"); hidePages(); }
 
-        function requestWithdraw() {
-            let upi = document.getElementById('upi-id').value;
-            if(!upi.includes('@')) return tele.showAlert("UPI ID sahi dalo");
-            if(score < 100) return tele.showAlert("Min ₹1 (100 coins) chahiye");
-            history.unshift({ amt: (score/100).toFixed(2), upi: upi, status: 'PENDING', date: new Date().toLocaleString() });
-            score = 0; updateUI();
-            tele.showAlert("Request sent successfully!");
-        }
-
-        function openPage(id) { 
-            document.querySelectorAll('.sub-page').forEach(p=>p.style.display='none');
-            document.getElementById(id).style.display = 'block'; 
-        }
-        function closePages() { document.querySelectorAll('.sub-page').forEach(p=>p.style.display='none'); }
-
-        setInterval(() => { if(currE < maxE) { currE++; updateUI(); } }, 2000);
-        updateUI();
+        setInterval(() => { if(curE < maxE) { curE++; update(); } }, 2000);
+        update();
     </script>
 </body>
 </html>
