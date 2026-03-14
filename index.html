@@ -6,47 +6,56 @@
     <title>Tapsterra Hourly Loot</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { background: #0b0b0b; color: white; font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; overflow: hidden; user-select: none; }
+        body { background: #0b0b0b; color: white; font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; overflow: hidden; user-select: none; display: flex; flex-direction: column; align-items: center; }
         
-        /* Top Stats */
-        .stats-container { display: flex; justify-content: space-between; padding: 15px; gap: 10px; }
-        .stat-box { background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 15px; flex: 1; }
-        .stat-label { font-size: 10px; color: #888; text-transform: uppercase; margin-bottom: 5px; }
-        .stat-val { font-size: 18px; font-weight: bold; color: #ffcc00; }
+        /* Stats Row */
+        .stats-container { display: flex; justify-content: space-between; width: 90%; padding: 15px 0; gap: 10px; }
+        .stat-box { background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 12px; flex: 1; }
+        .stat-label { font-size: 10px; color: #888; text-transform: uppercase; }
+        .stat-val { font-size: 18px; font-weight: bold; color: #ffcc00; margin-top: 5px; }
 
         /* Upgrade Buttons */
-        .upgrade-wrapper { display: flex; justify-content: space-between; padding: 0 15px; gap: 10px; margin-top: -5px; }
-        .main-up-btn { background: #1a1a1a; color: #00ffcc; border: 1px solid #333; border-radius: 8px; padding: 8px; flex: 1; cursor: pointer; font-size: 10px; font-weight: bold; }
+        .upgrade-wrapper { display: flex; justify-content: space-between; width: 90%; gap: 10px; margin-bottom: 20px; }
+        .main-up-btn { background: #1a1a1a; color: #00ffcc; border: 1px solid #333; border-radius: 8px; padding: 10px; flex: 1; cursor: pointer; font-size: 10px; font-weight: bold; text-transform: uppercase; }
 
-        /* Wallet Area (Marked Section) */
-        .wallet-container { background: rgba(255, 255, 255, 0.03); border: 1px dashed #444; border-radius: 50px; display: inline-flex; align-items: center; padding: 10px 25px; margin: 25px 0; }
-        .wallet-info { text-align: left; margin-left: 10px; }
-        .wallet-label { font-size: 10px; color: #aaa; display: block; }
-        .wallet-coins { font-size: 24px; font-weight: bold; color: white; }
-        .wallet-rs { font-size: 12px; color: #00ffcc; font-weight: bold; margin-left: 10px; }
+        /* Wallet Center Alignment */
+        .wallet-container { 
+            background: rgba(255, 255, 255, 0.03); 
+            border: 1px dashed #444; 
+            border-radius: 50px; 
+            display: inline-flex; 
+            align-items: center; 
+            padding: 12px 30px; 
+            margin: 10px auto; 
+            justify-content: center;
+        }
+        .wallet-info { text-align: center; margin-left: 10px; }
+        .wallet-label { font-size: 10px; color: #aaa; display: block; margin-bottom: 2px; }
+        .wallet-coins { font-size: 26px; font-weight: bold; color: white; }
+        .wallet-rs { font-size: 14px; color: #00ffcc; font-weight: bold; margin-left: 10px; }
 
-        /* Main Tap Asset */
-        .coin-wrapper { position: relative; margin-top: 10px; display: inline-block; }
-        #main-tap-asset { width: 200px; cursor: pointer; transition: transform 0.1s; filter: drop-shadow(0 0 20px #00ff00); }
-        #main-tap-asset:active { transform: scale(0.92); }
+        /* Main Coin Center */
+        .coin-wrapper { margin-top: 30px; display: flex; justify-content: center; width: 100%; }
+        #main-tap-coin { width: 220px; cursor: pointer; transition: transform 0.1s; filter: drop-shadow(0 0 25px rgba(255, 204, 0, 0.4)); }
+        #main-tap-coin:active { transform: scale(0.92); }
         
-        .plus-one { position: absolute; color: #00ffcc; font-size: 28px; font-weight: bold; pointer-events: none; animation: flyUp 0.8s ease-out forwards; }
-        @keyframes flyUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-120px); } }
+        .plus-one { position: absolute; color: #ffcc00; font-size: 32px; font-weight: bold; pointer-events: none; animation: flyUp 0.8s ease-out forwards; z-index: 100; }
+        @keyframes flyUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-140px); } }
 
         /* Bottom Nav */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; display: flex; background: #000; padding: 12px 0; border-top: 1px solid #222; }
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; display: flex; background: #000; padding: 15px 0; border-top: 1px solid #222; }
         .nav-item { flex: 1; font-size: 10px; color: #666; cursor: pointer; }
         .nav-item.active { color: #ffcc00; }
 
         /* Hidden Pages */
         .sub-page { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0b0b; z-index: 1000; padding-top: 50px; }
-        .back-home { background: #333; color: white; border: none; padding: 10px 20px; border-radius: 8px; margin-top: 30px; }
+        .back-home { background: #ffcc00; color: black; border: none; padding: 12px 25px; border-radius: 10px; margin-top: 30px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div id="home-page">
-        <div class="stats-container">
+    <div id="home-page" style="width: 100%;">
+        <div class="stats-container" style="margin: 0 auto;">
             <div class="stat-box">
                 <div class="stat-label">Earn per tap</div>
                 <div class="stat-val">+1</div>
@@ -57,13 +66,13 @@
             </div>
         </div>
 
-        <div class="upgrade-wrapper">
+        <div class="upgrade-wrapper" style="margin: 0 auto;">
             <button class="main-up-btn" onclick="openPage('upgrade-tap-page')">🚀 UPGRADE TAP</button>
             <button class="main-up-btn" onclick="openPage('upgrade-energy-page')" style="color: #ffcc00;">⚡ UPGRADE ENERGY</button>
         </div>
 
         <div class="wallet-container">
-            <img src="https://cdn-icons-png.flaticon.com/512/2331/2331711.png" width="35">
+            <img src="https://cdn-icons-png.flaticon.com/512/2489/2489756.png" width="35">
             <div class="wallet-info">
                 <span class="wallet-label">YOUR EARNING</span>
                 <span class="wallet-coins" id="total-coins">0</span>
@@ -72,7 +81,7 @@
         </div>
 
         <div class="coin-wrapper">
-            <img src="https://cdn-icons-png.flaticon.com/512/8142/8142163.png" id="main-tap-asset">
+            <img src="https://cdn-icons-png.flaticon.com/512/2489/2489756.png" id="main-tap-coin">
         </div>
 
         <div class="bottom-nav">
@@ -83,11 +92,11 @@
         </div>
     </div>
 
-    <div id="upgrade-tap-page" class="sub-page"><h2>Upgrade Tap Power</h2><button class="back-home" onclick="closeAllPages()">Back Home</button></div>
-    <div id="upgrade-energy-page" class="sub-page"><h2>Upgrade Energy Limit</h2><button class="back-home" onclick="closeAllPages()">Back Home</button></div>
-    <div id="task-page" class="sub-page"><h2>More Tasks</h2><p>Complete tasks to earn extra!</p><button class="back-home" onclick="closeAllPages()">Back Home</button></div>
-    <div id="friends-page" class="sub-page"><h2>Invite Friends</h2><p>Earn 10% from friends!</p><button class="back-home" onclick="closeAllPages()">Back Home</button></div>
-    <div id="earn-page" class="sub-page"><h2>Earn More</h2><p>Watch ads or daily check-in.</p><button class="back-home" onclick="closeAllPages()">Back Home</button></div>
+    <div id="upgrade-tap-page" class="sub-page"><h2>Tap Power Upgrade</h2><button class="back-home" onclick="closeAllPages()">Back Home</button></div>
+    <div id="upgrade-energy-page" class="sub-page"><h2>Energy Limit Upgrade</h2><button class="back-home" onclick="closeAllPages()">Back Home</button></div>
+    <div id="task-page" class="sub-page"><h2>More Tasks</h2><p>Pura karo aur kamao!</p><button class="back-home" onclick="closeAllPages()">Back Home</button></div>
+    <div id="friends-page" class="sub-page"><h2>Invite Friends</h2><p>Doston ko bulao!</p><button class="back-home" onclick="closeAllPages()">Back Home</button></div>
+    <div id="earn-page" class="sub-page"><h2>Earn More</h2><p>Yahan Ads aur Bonus aayenge.</p><button class="back-home" onclick="closeAllPages()">Back Home</button></div>
 
     <script>
         let tele = window.Telegram.WebApp;
@@ -100,7 +109,7 @@
             document.getElementById('total-coins').innerText = score;
             document.getElementById('energy-val').innerText = energy;
             
-            // 100 Coins = 1 Rs Calculation
+            // 100 Coins = 1 Rs
             let rupees = (score / 100).toFixed(2);
             document.getElementById('total-rs').innerText = rupees;
 
@@ -108,21 +117,22 @@
             localStorage.setItem('tap_energy', energy);
         }
 
-        document.getElementById('main-tap-asset').addEventListener('click', (e) => {
+        document.getElementById('main-tap-coin').addEventListener('click', (e) => {
             if (energy > 0) {
                 score++;
                 energy--;
                 
+                // Centered Float Animation
                 const p1 = document.createElement('div');
                 p1.innerText = '+1'; p1.className = 'plus-one';
-                p1.style.left = (e.clientX - 20) + 'px';
-                p1.style.top = (e.clientY - 40) + 'px';
+                p1.style.left = (e.clientX - 15) + 'px';
+                p1.style.top = (e.clientY - 30) + 'px';
                 document.body.appendChild(p1);
                 setTimeout(() => p1.remove(), 800);
                 
                 updateUI();
             } else {
-                tele.showAlert("Energy khatam! 1 ghante baad aao.");
+                tele.showAlert("Energy khatam! Thoda intezar karo.");
             }
         });
 
