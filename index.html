@@ -80,7 +80,7 @@
             </div>
             <div class="stat-box">
                 <div class="stat-label">Energy</div>
-                <div class="stat-val"><span id="energy-val">10</span>/10</div>
+                <div class="stat-val"><span id="current-energy">10</span>/<span id="max-energy">10</span></div>
             </div>
         </div>
 
@@ -112,19 +112,28 @@
 
     <div id="upgrade-tap-page" class="sub-page">
         <h2 style="color: #00ffcc;">Tap Upgrade Center</h2>
-        <p style="color: #888;">Current Level: <span id="current-lvl-display">1</span></p>
-        
+        <p style="color: #888;">Tap Level: <span id="tap-lvl-display">1</span></p>
         <div class="upgrade-card">
-            <h3 id="upgrade-title">🔥 Power Up</h3>
-            <p id="upgrade-desc">Get +2 coins every time you tap!</p>
-            <div class="price-tag">Cost: <span id="upgrade-cost-display">200</span> Coins</div>
-            <button id="buy-upgrade-btn" class="buy-btn" onclick="buyTapUpgrade()">UPGRADE</button>
+            <h3>🔥 Power Up</h3>
+            <p id="tap-upgrade-desc">Har tap par +2 coins milega!</p>
+            <div class="price-tag">Cost: <span id="tap-cost-display">200</span> Coins</div>
+            <button id="buy-tap-btn" class="buy-btn" onclick="buyTapUpgrade()">UPGRADE TAP</button>
         </div>
-
         <button class="back-home" onclick="closeAllPages()">← Back to Home</button>
     </div>
 
-    <div id="upgrade-energy-page" class="sub-page"><h2>Energy Upgrade</h2><button class="back-home" onclick="closeAllPages()">Back</button></div>
+    <div id="upgrade-energy-page" class="sub-page">
+        <h2 style="color: #ffcc00;">Energy Upgrade Center</h2>
+        <p style="color: #888;">Energy Level: <span id="energy-lvl-display">1</span></p>
+        <div class="upgrade-card">
+            <h3>⚡ Battery Booster</h3>
+            <p id="energy-upgrade-desc">Energy limit 20 kar dein!</p>
+            <div class="price-tag">Cost: <span id="energy-cost-display">100</span> Coins</div>
+            <button id="buy-energy-btn" class="buy-btn" onclick="buyEnergyUpgrade()">UPGRADE ENERGY</button>
+        </div>
+        <button class="back-home" onclick="closeAllPages()">← Back to Home</button>
+    </div>
+
     <div id="task-page" class="sub-page"><h2>Tasks</h2><button class="back-home" onclick="closeAllPages()">Back</button></div>
     <div id="friends-page" class="sub-page"><h2>Friends</h2><button class="back-home" onclick="closeAllPages()">Back</button></div>
     <div id="withdraw-page" class="sub-page"><h2>Withdraw</h2><button class="back-home" onclick="closeAllPages()">Back</button></div>
@@ -135,47 +144,57 @@
 
         // Data Storage
         let score = parseInt(localStorage.getItem('tap_score')) || 0;
-        let energy = parseInt(localStorage.getItem('tap_energy')) || 10;
         let tapPower = parseInt(localStorage.getItem('tap_power')) || 1; 
+        let energyLvl = parseInt(localStorage.getItem('energy_lvl')) || 1;
+        let maxEnergy = energyLvl * 10;
+        let currentEnergy = parseInt(localStorage.getItem('current_energy')) || maxEnergy;
 
         function updateUI() {
+            // Stats Home
             document.getElementById('total-coins').innerText = score;
-            document.getElementById('energy-val').innerText = energy;
             document.getElementById('tap-power-val').innerText = tapPower;
+            document.getElementById('current-energy').innerText = currentEnergy;
+            document.getElementById('max-energy').innerText = maxEnergy;
             document.getElementById('total-rs').innerText = (score / 100).toFixed(2);
-            document.getElementById('current-lvl-display').innerText = tapPower;
 
-            // Upgrade Logic for 12 Levels
-            let nextLvl = tapPower + 1;
-            let upBtn = document.getElementById('buy-upgrade-btn');
-            
+            // Tap Upgrade UI
+            document.getElementById('tap-lvl-display').innerText = tapPower;
+            let nextTapLvl = tapPower + 1;
+            let tapUpBtn = document.getElementById('buy-tap-btn');
             if(tapPower >= 12) {
-                document.getElementById('upgrade-title').innerText = "🏆 MAX LEVEL";
-                document.getElementById('upgrade-desc').innerText = "Aapne aakhri level paar kar liya hai!";
-                document.getElementById('upgrade-cost-display').innerText = "---";
-                upBtn.innerText = "MAX LEVEL REACHED";
-                upBtn.disabled = true;
+                tapUpBtn.innerText = "MAX LEVEL";
+                tapUpBtn.disabled = true;
             } else {
-                // Price Formula: 200 * 2^(nextLvl - 2)
-                // Lvl 2 = 200
-                // Lvl 3 = 400
-                // Lvl 4 = 800
-                let cost = 100 * Math.pow(2, tapPower); 
-                document.getElementById('upgrade-cost-display').innerText = cost;
-                document.getElementById('upgrade-desc').innerText = `Har tap par +${nextLvl} coins milega!`;
-                upBtn.innerText = `UPGRADE TO LVL ${nextLvl}`;
+                let tapCost = 100 * Math.pow(2, tapPower);
+                document.getElementById('tap-cost-display').innerText = tapCost;
+                document.getElementById('tap-upgrade-desc').innerText = `Har tap par +${nextTapLvl} coins milega!`;
             }
 
+            // Energy Upgrade UI
+            document.getElementById('energy-lvl-display').innerText = energyLvl;
+            let nextEnergyLvl = energyLvl + 1;
+            let energyUpBtn = document.getElementById('buy-energy-btn');
+            if(energyLvl >= 12) {
+                energyUpBtn.innerText = "MAX LEVEL";
+                energyUpBtn.disabled = true;
+            } else {
+                let energyCost = 50 * Math.pow(2, energyLvl); // Starts at 100 (50*2^1)
+                document.getElementById('energy-cost-display').innerText = energyCost;
+                document.getElementById('energy-upgrade-desc').innerText = `Energy limit badhakar ${nextEnergyLvl * 10} kar dein!`;
+            }
+
+            // Save Data
             localStorage.setItem('tap_score', score);
-            localStorage.setItem('tap_energy', energy);
             localStorage.setItem('tap_power', tapPower);
+            localStorage.setItem('energy_lvl', energyLvl);
+            localStorage.setItem('current_energy', currentEnergy);
         }
 
         // Tap Logic
         document.getElementById('main-tap-coin').addEventListener('click', function(e) {
-            if (energy > 0) {
+            if (currentEnergy > 0) {
                 score += tapPower;
-                energy--;
+                currentEnergy--;
                 
                 const p1 = document.createElement('div');
                 p1.innerText = '+' + tapPower;
@@ -187,22 +206,45 @@
                 
                 updateUI();
             } else {
-                tele.showAlert("Energy khatam! Thoda wait karo.");
+                tele.showAlert("Energy khatam! Refill ka intezar karein.");
             }
         });
 
-        // Upgrade Function
+        // Tap Upgrade Function
         function buyTapUpgrade() {
             let cost = 100 * Math.pow(2, tapPower);
             if (score >= cost) {
                 score -= cost;
                 tapPower += 1; 
-                tele.showAlert(`Badhai ho! Level ${tapPower} unlocked! Har tap par +${tapPower} milega.`);
+                tele.showAlert(`Level Up! Ab aapko har tap par +${tapPower} milega.`);
                 updateUI();
             } else {
-                tele.showAlert(`Bhai, is upgrade ke liye ${cost} coins chahiye!`);
+                tele.showAlert(`Bhai, ${cost} coins toh jama karo pehle!`);
             }
         }
+
+        // Energy Upgrade Function
+        function buyEnergyUpgrade() {
+            let cost = 50 * Math.pow(2, energyLvl);
+            if (score >= cost) {
+                score -= cost;
+                energyLvl += 1;
+                maxEnergy = energyLvl * 10;
+                currentEnergy = maxEnergy; // Refill on upgrade
+                tele.showAlert(`Battery Level Up! Ab aapki max energy ${maxEnergy} hai.`);
+                updateUI();
+            } else {
+                tele.showAlert(`Bhai, is upgrade ke liye ${cost} coins lagenge!`);
+            }
+        }
+
+        // Auto Energy Refill (1 point per 5 seconds)
+        setInterval(() => {
+            if (currentEnergy < maxEnergy) {
+                currentEnergy++;
+                updateUI();
+            }
+        }, 5000);
 
         function openPage(id) {
             document.querySelectorAll('.sub-page').forEach(p => p.style.display = 'none');
