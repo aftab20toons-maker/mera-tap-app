@@ -61,10 +61,10 @@
 
         #main-tap-coin:active { transform: scale(0.92) rotateX(10deg); }
         
-        /* --- WHITE +1 ANIMATION --- */
+        /* White +1 Animation */
         .plus-one { 
             position: absolute; 
-            color: #ffffff; /* Yellow se White kar diya */
+            color: #ffffff; 
             font-size: 35px; 
             font-weight: bold; 
             pointer-events: none; 
@@ -86,6 +86,10 @@
         /* Sub Pages */
         .sub-page { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0b0b; z-index: 1000; padding-top: 50px; }
         .back-home { background: #ffcc00; color: black; border: none; padding: 12px 25px; border-radius: 10px; margin-top: 30px; font-weight: bold; cursor: pointer; }
+        
+        /* Withdraw Styles */
+        .withdraw-card { background: #1a1a1a; margin: 20px; padding: 20px; border-radius: 15px; border: 1px solid #333; }
+        .withdraw-btn { background: #00ffcc; color: black; border: none; padding: 15px 40px; border-radius: 10px; font-weight: bold; margin-top: 20px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -124,7 +128,7 @@
             <div class="nav-item active" onclick="closeAllPages()">🏠<br>Home</div>
             <div class="nav-item" onclick="openPage('task-page')">⛏️<br>More Task</div>
             <div class="nav-item" onclick="openPage('friends-page')">👥<br>Friends</div>
-            <div class="nav-item" onclick="openPage('earn-page')">💰<br>Earn</div>
+            <div class="nav-item" onclick="openPage('withdraw-page')">💰<br>Withdraw</div>
         </div>
     </div>
 
@@ -132,7 +136,18 @@
     <div id="upgrade-energy-page" class="sub-page"><h2>Energy Upgrade</h2><button class="back-home" onclick="closeAllPages()">Back Home</button></div>
     <div id="task-page" class="sub-page"><h2>More Task</h2><button class="back-home" onclick="closeAllPages()">Back Home</button></div>
     <div id="friends-page" class="sub-page"><h2>Friends</h2><button class="back-home" onclick="closeAllPages()">Back Home</button></div>
-    <div id="earn-page" class="sub-page"><h2>Earn More</h2><button class="back-home" onclick="closeAllPages()">Back Home</button></div>
+    
+    <div id="withdraw-page" class="sub-page">
+        <h2>Withdraw Earning</h2>
+        <div class="withdraw-card">
+            <p style="color: #888;">Available Balance</p>
+            <h1 style="color: #00ffcc;">₹<span id="withdraw-balance">0.00</span></h1>
+            <p style="font-size: 12px;">Minimum Withdraw: ₹100</p>
+        </div>
+        <button class="withdraw-btn" onclick="tele.showAlert('Paisa nikalne ke liye ₹100 chahiye!')">WITHDRAW NOW</button>
+        <br>
+        <button class="back-home" onclick="closeAllPages()">Back Home</button>
+    </div>
 
     <script>
         let tele = window.Telegram.WebApp;
@@ -144,7 +159,11 @@
         function updateUI() {
             document.getElementById('total-coins').innerText = score;
             document.getElementById('energy-val').innerText = energy;
-            document.getElementById('total-rs').innerText = (score / 100).toFixed(2);
+            
+            let rupees = (score / 100).toFixed(2);
+            document.getElementById('total-rs').innerText = rupees;
+            document.getElementById('withdraw-balance').innerText = rupees;
+
             localStorage.setItem('tap_score', score);
             localStorage.setItem('tap_energy', energy);
         }
@@ -153,7 +172,6 @@
             if (energy > 0) {
                 score++; energy--;
                 
-                // White +1 Animation
                 const p1 = document.createElement('div');
                 p1.innerText = '+1'; p1.className = 'plus-one';
                 p1.style.left = (e.clientX - 20) + 'px';
@@ -169,15 +187,4 @@
 
         function openPage(id) {
             closeAllPages();
-            document.getElementById(id).style.display = 'block';
-        }
-
-        function closeAllPages() {
-            const pages = document.querySelectorAll('.sub-page');
-            pages.forEach(p => p.style.display = 'none');
-        }
-
-        updateUI();
-    </script>
-</body>
-</html>
+            document.getElementById(id).style.display =
