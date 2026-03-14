@@ -47,19 +47,110 @@
         <span style="color:#00ffcc; border-left:1px solid #444; padding-left:10px;">₹<span id="rs">0.00</span></span>
     </div>
     <div class="coin-wrap"><div id="tap-coin"></div></div>
-    <div class="bottom-nav"><div class="nav-item" style="color:#ffcc00" onclick="closeP()">🏠 Home</div><div class="nav-item" onclick="openP('p-wd')">💰 Withdraw</div></div>
+    <div class="bottom-nav">
+        <div class="nav-item" style="color:#ffcc00" onclick="closeP()">🏠 Home</div>
+        <div class="nav-item" onclick="openP('p-wd')">💰 Withdraw</div>
+    </div>
 </div>
 
 <div id="p-tap" class="page">
     <h2>Upgrade Tap Power</h2>
-    <div class="page-card"><p>Current Level: <span id="pt-lvl">0</span></p><h3 id="pt-cost">Cost: 100</h3><button class="buy-now" onclick="up('tap')">UPGRADE NOW</button></div>
+    <div class="page-card"><p>Level: <span id="pt-lvl">0</span></p><h3 id="pt-cost">Cost: 100</h3><button class="buy-now" onclick="up('tap')">UPGRADE NOW</button></div>
     <button onclick="closeP()" style="margin-top:20px; color:gray; background:none; border:none;">← Back</button>
 </div>
 
 <div id="p-eng" class="page">
     <h2>Upgrade Energy</h2>
-    <div class="page-card"><p>Current Level: <span id="pe-lvl">0</span></p><h3 id="pe-cost">Cost: 100</h3><button class="buy-now" style="background:#ffcc00" onclick="up('eng')">UPGRADE NOW</button></div>
+    <div class="page-card"><p>Level: <span id="pe-lvl">0</span></p><h3 id="pe-cost">Cost: 100</h3><button class="buy-now" style="background:#ffcc00" onclick="up('eng')">UPGRADE NOW</button></div>
     <button onclick="closeP()" style="margin-top:20px; color:gray; background:none; border:none;">← Back</button>
 </div>
 
-<div id
+<div id="p-wd" class="page">
+    <h2 style="color:#00ffcc">Withdrawal</h2>
+    <input type="text" id="upi" placeholder="Enter UPI ID">
+    <div class="page-card"><h4>1. Progressive</h4><button class="buy-now" onclick="wd('prog')">Withdraw ₹<span id="prog-v">1</span></button></div>
+    <div class="page-card"><h4>2. Always High</h4><button class="buy-now" style="background:#ffcc00" onclick="wd('always')">Withdraw ₹<span id="alw-v">10</span></button></div>
+    <div style="text-align:left; margin-top:20px; padding-bottom:100px;"><h4 style="border-bottom:1px solid #333;">History</h4><div id="hist-list"></div></div>
+    <button onclick="closeP()" style="position:fixed; bottom:20px; left:50%; transform:translateX(-50%); color:gray; background:#000; padding:10px 30px; border-radius:10px; border:1px solid #333;">← Back</button>
+</div>
+
+<script>
+    let tg = window.Telegram.WebApp; tg.expand();
+    
+    // STORAGE FIX
+    let s = parseInt(localStorage.getItem('s')) || 0;
+    let tl = parseInt(localStorage.getItem('tl')) || 0;
+    let el = parseInt(localStorage.getItem('el')) || 0;
+    let wl = parseInt(localStorage.getItem('wl')) || 1;
+    let hi = JSON.parse(localStorage.getItem('hi')) || [];
+    let me = el * 100;
+    let ce = localStorage.getItem('ce') !== null ? parseInt(localStorage.getItem('ce')) : me;
+
+    function upd() {
+        document.getElementById('sc').innerText = s;
+        document.getElementById('rs').innerText = (s/100).toFixed(2);
+        document.getElementById('h-tl').innerText = tl;
+        document.getElementById('h-tv').innerText = tl;
+        document.getElementById('h-el').innerText = el;
+        document.getElementById('ce').innerText = ce;
+        document.getElementById('me').innerText = me;
+        document.getElementById('pt-lvl').innerText = tl;
+        document.getElementById('pt-cost').innerText = "Cost: " + ((tl + 1) * 100);
+        document.getElementById('pe-lvl').innerText = el;
+        document.getElementById('pe-cost').innerText = "Cost: " + ((el + 1) * 100);
+        document.getElementById('prog-v').innerText = wl;
+        document.getElementById('alw-v').innerText = wl + 9;
+
+        let hl = document.getElementById('hist-list');
+        hl.innerHTML = hi.map(i => `
+            <div class="hist-item">
+                <div style="display:flex; justify-content:space-between;"><b>₹${i.amt}</b><span style="color:${i.status==='SUCCESS'?'#00ffcc':'#ffcc00'}">${i.status}</span></div>
+                <div class="${i.status==='PENDING'?'note-pending':'note-success'}">${i.status==='PENDING'?'Tension na lo, 20 minutes se 2 hours ke beech payment ho jayega.':'Congratulation! First payment mil gaya ab tap ko aur energy upgrade karo.'}</div>
+            </div>`).join('') || '<small style="color:#444">No history yet</small>';
+
+        localStorage.setItem('s', s);
+        localStorage.setItem('tl', tl);
+        localStorage.setItem('el', el);
+        localStorage.setItem('ce', ce);
+        localStorage.setItem('wl', wl);
+        localStorage.setItem('hi', JSON.stringify(hi));
+    }
+
+    document.getElementById('tap-coin').onclick = (e) => {
+        if(tl <= 0) return tg.showAlert("Pehle Upgrade Tap Power!");
+        if(ce > 0) {
+            s += tl; ce--; // EXACT INCREMENT
+            let p = document.createElement('div'); p.className='plus-one'; p.innerText="+"+tl;
+            p.style.left=e.clientX+'px'; p.style.top=e.clientY+'px';
+            document.body.appendChild(p); setTimeout(()=>p.remove(),600);
+            upd();
+        } else { tg.showAlert("Energy khatam!"); }
+    };
+
+    function up(type) {
+        let cost = (type==='tap'?(tl+1):(el+1))*100;
+        if(s >= cost) {
+            s -= cost;
+            if(type==='tap') tl++; 
+            else { el++; me = el * 100; ce = me; }
+            upd();
+        } else { tg.showAlert("Need " + cost + " coins!"); }
+    }
+
+    function wd(type) {
+        let u = document.getElementById('upi').value; if(!u.includes('@')) return tg.showAlert("UPI ID?");
+        let v = (type==='prog')?wl:(wl+9);
+        if(s >= v*100) { 
+            s -= v*100; if(type==='prog') wl++; 
+            hi.unshift({amt:v, status:'PENDING', date:new Date().toLocaleString()}); 
+            upd(); tg.showAlert("Requested!"); 
+        } else tg.showAlert("Low coins!");
+    }
+
+    function openP(id) { document.getElementById(id).style.display='block'; }
+    function closeP() { document.querySelectorAll('.page').forEach(p=>p.style.display='none'); }
+    setInterval(() => { if(ce < me) { ce++; upd(); } }, 2000);
+    upd();
+</script>
+</body>
+</html>
