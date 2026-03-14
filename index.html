@@ -3,216 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tap Fast Pro - Official</title>
+    <title>Golden Tap - Battle Style</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body { background: #0b0b0b; color: white; font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; overflow: hidden; user-select: none; }
-        .header { padding: 10px; font-size: 1.2rem; color: #00ffcc; font-weight: bold; background: #1a1a1a; border-bottom: 1px solid #333; }
         
-        /* Wallet UI */
-        .wallet-card { background: linear-gradient(135deg, #1a1a1a, #2c2c2c); margin: 15px 20px; padding: 15px; border-radius: 15px; border: 1px solid #333; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        .balance-label { font-size: 0.8rem; color: #aaa; }
-        .rupee-val { font-size: 2rem; color: #00ffcc; font-weight: bold; margin: 5px 0; }
-        
-        .score-box { font-size: 1.5rem; margin: 10px; color: #fff; }
-        .score-box span { color: #ff00ff; font-weight: bold; font-size: 2rem; }
-        
-        /* Coin Animation */
-        .coin-container { position: relative; display: inline-block; margin-top: 10px; }
-        #main-coin { width: 160px; cursor: pointer; transition: 0.1s; filter: drop-shadow(0 0 15px #00ffcc); -webkit-tap-highlight-color: transparent; }
+        /* Top Stats Bar */
+        .stats-container { display: flex; justify-content: space-between; padding: 15px; gap: 10px; }
+        .stat-box { background: rgba(255, 255, 255, 0.05); border: 1px solid #333; border-radius: 12px; padding: 10px; flex: 1; }
+        .stat-label { font-size: 10px; color: #00ffcc; text-transform: uppercase; margin-bottom: 5px; }
+        .stat-val { font-size: 16px; font-weight: bold; }
+        .up-btn { font-size: 9px; background: #00ffcc; color: black; border-radius: 4px; padding: 2px 5px; border: none; margin-top: 5px; cursor: pointer; }
+
+        /* Main Score */
+        .main-score { font-size: 3rem; font-weight: bold; margin: 20px 0; text-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+        .main-score img { width: 30px; vertical-align: middle; margin-right: 10px; }
+
+        /* Coin Area */
+        .coin-wrapper { position: relative; margin-top: 30px; display: inline-block; }
+        #main-coin { width: 220px; height: 220px; border-radius: 50%; cursor: pointer; transition: transform 0.1s; }
         #main-coin:active { transform: scale(0.92); }
         
-        .plus-one { position: absolute; color: #00ffcc; font-size: 24px; font-weight: bold; pointer-events: none; animation: flyUp 0.8s ease-out forwards; z-index: 100; }
-        @keyframes flyUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-100px); } }
+        /* Floating Animation */
+        .plus-one { position: absolute; color: #ffcc00; font-size: 28px; font-weight: bold; pointer-events: none; animation: flyUp 0.8s ease-out forwards; }
+        @keyframes flyUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-120px); } }
 
-        /* Buttons */
-        .btn { display: none; margin: 15px auto; padding: 15px; border-radius: 12px; border: none; font-weight: bold; width: 85%; cursor: pointer; font-size: 1rem; }
-        #earn-more-btn { background: linear-gradient(45deg, #00b09b, #96c93d); color: white; box-shadow: 0 4px 10px rgba(0,255,150,0.2); }
-        #cooldown-btn { background: #222; color: #ff5858; cursor: not-allowed; border: 1px solid #ff5858; display: none; }
-        #nav-withdraw { background: #333; color: white; display: block; margin-top: 20px; font-size: 0.9rem; border: 1px solid #444; }
-
-        /* Withdraw Page */
-        #withdraw-page { display: none; padding: 20px; }
-        .back-btn { background: #444; color: white; padding: 12px 25px; border-radius: 10px; border: none; cursor: pointer; margin-top: 30px; font-weight: bold; }
-
-        /* Loader */
-        #ad-loader { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; }
-        .spinner { border: 4px solid #333; border-top: 4px solid #00ffcc; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* Navigation Pages */
+        #upgrade-page, #energy-page { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0b0b; padding-top: 50px; z-index: 1000; }
+        .back-btn { background: #333; color: white; border: none; padding: 10px 20px; border-radius: 8px; margin-top: 20px; }
     </style>
 </head>
 <body>
 
-    <div id="ad-loader">
-        <div class="spinner"></div>
-        <p id="loader-text" style="color:#00ffcc; margin-top:20px; font-weight: bold;">Verifying Ad... 10s</p>
-    </div>
-
     <div id="game-page">
-        <div class="header">TAP FAST PRO ⚡</div>
-        
-        <div class="wallet-card">
-            <div class="balance-label">Total Earnings</div>
-            <div class="rupee-val">₹<span id="rupee-amt">0.00</span></div>
-            <div style="font-size: 0.7rem; color: #666;">Rate: 400 Coins = ₹1</div>
+        <div class="stats-container">
+            <div class="stat-box">
+                <div class="stat-label">Earn per tap</div>
+                <div class="stat-val">+<span id="per-tap">1</span></div>
+                <button class="up-btn" onclick="openPage('upgrade-page')">UPGRADE</button>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Energy</div>
+                <div class="stat-val"><span id="energy-val">10</span>/10</div>
+                <button class="up-btn" onclick="openPage('energy-page')" style="background: #ffcc00;">UPGRADE</button>
+            </div>
         </div>
 
-        <div class="score-box"><span id="score">0</span> <small style="font-size: 0.8rem; color: #aaa;">Points</small></div>
-        <div style="color:#ff00ff; margin-bottom: 5px; font-weight: bold;">Taps Left: <span id="taps-left">10</span>/10</div>
-
-        <div class="coin-container" id="coin-wrapper">
-            <img src="https://cdn-icons-png.flaticon.com/512/5968/5968330.png" id="main-coin">
+        <div class="main-score">
+            <img src="https://cdn-icons-png.flaticon.com/512/2489/2489756.png" alt="coin">
+            <span id="total-score">0</span>
         </div>
 
-        <button id="earn-more-btn" class="btn" onclick="handleAdClick()">💰 Earn +10 Points & Recharge</button>
-        <button id="cooldown-btn" class="btn">Ads Locked! Wait: <span id="timer">60:00</span></button>
-        
-        <button id="nav-withdraw" class="btn" onclick="showWithdraw()">Open Wallet / Withdraw</button>
+        <div class="coin-wrapper" id="coin-area">
+            <img src="https://cdn-icons-png.flaticon.com/512/2489/2489756.png" id="main-coin">
+        </div>
     </div>
 
-    <div id="withdraw-page">
-        <div class="header">MY WALLET</div>
-        <div class="wallet-card">
-            <div class="balance-label">Available Balance</div>
-            <div class="rupee-val" style="color: #ff00ff;">₹<span id="withdraw-rs">0.00</span></div>
-        </div>
-        <p style="color: #00ffcc; font-size: 0.9rem;">Min. Withdraw: ₹50</p>
-        
-        <div style="text-align: left; padding: 20px; color: #888; font-size: 0.8rem; background: #111; margin: 10px; border-radius: 10px;">
-            • Don't clear phone cache (Data Loss risk).<br>
-            • Withdrawals processed every Sunday.<br>
-            • Fake clicks = Account Ban.
-        </div>
-        
-        <button class="back-btn" onclick="showHome()">← Back to Home</button>
+    <div id="upgrade-page">
+        <h2>Upgrade Tap Power</h2>
+        <p style="color: #888;">Nayi updates yahan aayengi...</p>
+        <button class="back-btn" onclick="closePages()">← Back</button>
+    </div>
+
+    <div id="energy-page">
+        <h2>Upgrade Energy Limit</h2>
+        <p style="color: #888;">Nayi updates yahan aayengi...</p>
+        <button class="back-btn" onclick="closePages()">← Back</button>
     </div>
 
     <script>
         let tele = window.Telegram.WebApp;
         tele.expand();
 
-        const myAdLink = "https://www.effectivegatecpm.com/h2k3bt3ugx?key=61b8801b9434839364f72a682179f2d0"; 
+        let score = parseInt(localStorage.getItem('tap_score')) || 0;
+        let energy = parseInt(localStorage.getItem('tap_energy')) || 10;
+        let lastRefill = localStorage.getItem('last_refill') || Date.now();
 
-        // Data Storage
-        let score = parseInt(localStorage.getItem('user_score')) || 0;
-        let tapsLeft = localStorage.getItem('user_taps') !== null ? parseInt(localStorage.getItem('user_taps')) : 10;
-        let adsViewed = parseInt(localStorage.getItem('ads_viewed')) || 0;
-        let cooldownTime = localStorage.getItem('cooldown_time') || null;
+        // 1 Hr Refill Logic (10 Energy per hour)
+        setInterval(() => {
+            let now = Date.now();
+            if (now - lastRefill > 3600000 && energy < 10) { // 3600000ms = 1hr
+                energy = 10;
+                lastRefill = now;
+                localStorage.setItem('last_refill', lastRefill);
+                updateUI();
+            }
+        }, 10000);
 
         function updateUI() {
-            document.getElementById('score').innerText = score;
-            document.getElementById('taps-left').innerText = tapsLeft;
-            
-            // ₹ Calculation (400 = 1)
-            let money = (score / 400).toFixed(2);
-            document.getElementById('rupee-amt').innerText = money;
-            document.getElementById('withdraw-rs').innerText = money;
-
-            localStorage.setItem('user_score', score);
-            localStorage.setItem('user_taps', tapsLeft);
-            localStorage.setItem('ads_viewed', adsViewed);
-
-            const mainCoin = document.getElementById('main-coin');
-            const earnBtn = document.getElementById('earn-more-btn');
-            const cooldownBtn = document.getElementById('cooldown-btn');
-
-            if (tapsLeft > 0) {
-                mainCoin.style.display = 'inline-block';
-                earnBtn.style.display = 'none';
-                cooldownBtn.style.display = 'none';
-            } else {
-                mainCoin.style.display = 'none';
-                // Check if 3 ads reached
-                const now = new Date().getTime();
-                if (cooldownTime && now < cooldownTime) {
-                    earnBtn.style.display = 'none';
-                    cooldownBtn.style.display = 'block';
-                    startTimer(cooldownTime);
-                } else {
-                    // Reset if cooldown passed
-                    if (cooldownTime) {
-                        adsViewed = 0;
-                        cooldownTime = null;
-                        localStorage.setItem('ads_viewed', 0);
-                        localStorage.removeItem('cooldown_time');
-                    }
-                    cooldownBtn.style.display = 'none';
-                    earnBtn.style.display = 'block';
-                }
-            }
-        }
-
-        let timerActive = false;
-        function startTimer(endTime) {
-            if (timerActive) return;
-            timerActive = true;
-            const tInt = setInterval(() => {
-                const now = new Date().getTime();
-                const diff = endTime - now;
-                if (diff <= 0) {
-                    clearInterval(tInt);
-                    timerActive = false;
-                    updateUI();
-                } else {
-                    let mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                    let secs = Math.floor((diff % (1000 * 60)) / 1000);
-                    document.getElementById('timer').innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-                }
-            }, 1000);
+            document.getElementById('total-score').innerText = score;
+            document.getElementById('energy-val').innerText = energy;
+            localStorage.setItem('tap_score', score);
+            localStorage.setItem('tap_energy', energy);
         }
 
         document.getElementById('main-coin').addEventListener('click', (e) => {
-            if (tapsLeft > 0) {
-                score++; tapsLeft--;
+            if (energy > 0) {
+                score++;
+                energy--;
                 
-                // +1 Animation
+                // Animation
                 const p1 = document.createElement('div');
                 p1.innerText = '+1'; p1.className = 'plus-one';
-                p1.style.left = (e.clientX - document.getElementById('coin-wrapper').offsetLeft - 10) + 'px';
-                p1.style.top = (e.clientY - document.getElementById('coin-wrapper').offsetTop - 20) + 'px';
-                document.getElementById('coin-wrapper').appendChild(p1);
+                p1.style.left = (e.clientX - 20) + 'px';
+                p1.style.top = (e.clientY - 40) + 'px';
+                document.body.appendChild(p1);
                 setTimeout(() => p1.remove(), 800);
                 
                 updateUI();
+            } else {
+                alert("Out of Energy! Wait for 1 hour.");
             }
         });
 
-        function handleAdClick() {
-            window.open(myAdLink, '_blank');
-            setTimeout(() => {
-                alert("Ads check done! Now verify for 10s to get points.");
-                const ldr = document.getElementById('ad-loader');
-                ldr.style.display = 'flex';
-                let v = 10;
-                const vInt = setInterval(() => {
-                    v--;
-                    document.getElementById('loader-text').innerText = `Verifying Ad... ${v}s`;
-                    if (v <= 0) {
-                        clearInterval(vInt);
-                        ldr.style.display = 'none';
-                        score += 10; tapsLeft = 10; adsViewed++;
-                        
-                        if (adsViewed >= 3) {
-                            cooldownTime = new Date().getTime() + (60 * 60 * 1000); // 1 Hr Cooldown
-                            localStorage.setItem('cooldown_time', cooldownTime);
-                            alert("Limit Reached! Come back after 1 hour.");
-                        } else {
-                            alert("Success! Points & Taps added.");
-                        }
-                        updateUI();
-                    }
-                }, 1000);
-            }, 5000);
+        function openPage(id) {
+            document.getElementById(id).style.display = 'block';
         }
 
-        function showWithdraw() {
-            document.getElementById('game-page').style.display = 'none';
-            document.getElementById('withdraw-page').style.display = 'block';
-        }
-
-        function showHome() {
-            document.getElementById('withdraw-page').style.display = 'none';
-            document.getElementById('game-page').style.display = 'block';
+        function closePages() {
+            document.getElementById('upgrade-page').style.display = 'none';
+            document.getElementById('energy-page').style.display = 'none';
         }
 
         updateUI();
