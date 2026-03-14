@@ -6,7 +6,7 @@
     <title>Tapsterra Hourly Loot</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        /* SAARE PURANE STYLES WAISA HI HAIN - NO CHANGE */
+        /* PURANE STYLES (NO CHANGE) */
         body { background: #0b0b0b; color: white; font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; overflow: hidden; user-select: none; display: flex; flex-direction: column; align-items: center; }
         .stats-upgrade-container { display: flex; justify-content: space-between; width: 95%; padding: 5px 0; gap: 8px; margin-top: 5px; }
         .stat-card { flex: 1; display: flex; flex-direction: column; gap: 2px; }
@@ -34,8 +34,9 @@
         .nav-item.active { color: #ffcc00; }
         .upi-form { display: none; background: #222; padding: 15px; border-radius: 12px; margin-top: 10px; border: 1px solid #00ffcc; }
         .upi-input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #000; color: #fff; margin-bottom: 10px; box-sizing: border-box; }
-        .history-section { margin-top: 30px; text-align: left; }
-        .history-item { background: #111; padding: 10px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid #00ffcc; font-size: 12px; }
+        .history-section { margin-top: 30px; text-align: left; padding-bottom: 50px; }
+        .history-item { background: #111; padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #ffcc00; font-size: 13px; }
+        .history-note { color: #888; font-size: 10px; margin-top: 5px; font-style: italic; line-height: 1.4; }
     </style>
 </head>
 <body>
@@ -59,16 +60,11 @@
                 <button class="tiny-up-btn energy" onclick="openPage('upgrade-energy-page')">⚡ Upgrade Energy</button>
             </div>
         </div>
-
         <div class="wallet-container">
             <span class="wallet-coins">💰 <span id="display-score">0</span></span>
             <span class="wallet-value">₹<span id="rs-value">0.00</span></span>
         </div>
-
-        <div class="coin-wrapper">
-            <div id="main-tap-coin"></div>
-        </div>
-
+        <div class="coin-wrapper"><div id="main-tap-coin"></div></div>
         <div class="bottom-nav">
             <div class="nav-item active" onclick="closeAllPages()">🏠 Home</div>
             <div class="nav-item" onclick="openPage('withdraw-page')">💰 Withdraw</div>
@@ -122,16 +118,18 @@
             </div>
             <button class="back-home" onclick="resetWithdraw()">← Piche Jao</button>
         </div>
+
         <div class="history-section">
             <h3 style="font-size: 14px; border-bottom: 1px solid #333; padding-bottom: 5px;">Withdrawal History</h3>
             <div id="history-list">
                 <p style="font-size: 10px; color:#666;">Abhi tak koi withdraw nahi kiya.</p>
             </div>
         </div>
-        <button class="back-home" style="background:#222" onclick="closeAllPages()">Band Karo</button>
+        <button class="back-home" style="background:#222; margin-bottom: 20px;" onclick="closeAllPages()">Band Karo</button>
     </div>
 
     <script>
+        // JS LOGIC (NO CHANGE EXCEPT HISTORY RENDERING)
         let tele = window.Telegram.WebApp;
         tele.expand();
 
@@ -143,7 +141,6 @@
         
         let pendingAmt = 0;
         let pendingType = '';
-
         let maxEnergy = energyLvl * 100;
         let currentEnergy = parseInt(localStorage.getItem('current_energy')) || maxEnergy;
 
@@ -165,8 +162,14 @@
             if (history.length > 0) {
                 historyList.innerHTML = history.map(item => `
                     <div class="history-item">
-                        <strong>₹${item.amount}</strong> - ${item.upi} <br>
-                        <span style="color:#ffaa00; font-size:9px;">${item.date} | Status: PENDING</span>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <strong style="color:#00ffcc; font-size:16px;">₹${item.amount}</strong>
+                            <span style="background:#ffcc00; color:#000; padding:2px 6px; border-radius:4px; font-size:9px; font-weight:bold;">PENDING</span>
+                        </div>
+                        <div style="color:#888; font-size:10px; margin-top:4px;">UPI: ${item.upi} | ${item.date}</div>
+                        <div class="history-note">
+                            Bhai tension mat lo, aapka withdrawal 2 se 10 ghante mein aa jayega. Tab tak aur earning karo! Jitna Tap aur Energy upgrade karoge, utni zyada kamayi hogi! 🚀
+                        </div>
                     </div>
                 `).join('');
             }
@@ -179,12 +182,10 @@
             localStorage.setItem('withdraw_history', JSON.stringify(history));
         }
 
-        // --- FIXED TAP LOGIC (1 Click = 1 Energy) ---
         document.getElementById('main-tap-coin').addEventListener('click', (e) => {
-            if(currentEnergy >= 1) { // Pehle yahan tapPower tha, ab 1 hai
-                score += tapPower;   // Coins poore milenge
-                currentEnergy -= 1;  // Energy sirf 1 kategi
-                
+            if(currentEnergy >= 1) {
+                score += tapPower;
+                currentEnergy -= 1;
                 let p = document.createElement('div');
                 p.innerText = "+" + tapPower; p.className = 'plus-one';
                 p.style.left = e.clientX + 'px'; p.style.top = e.clientY + 'px';
@@ -196,7 +197,6 @@
 
         setInterval(() => { if(currentEnergy < maxEnergy) { currentEnergy++; updateUI(); } }, 1500);
 
-        // --- SAARE BAAKI FUNCTIONS SAME HAIN ---
         function buyTapUpgrade() {
             let cost = 100 * Math.pow(2, tapPower);
             if(score >= cost) { score -= cost; tapPower++; updateUI(); tele.showAlert("Mubarak ho! Tap Power badh gayi."); }
@@ -234,7 +234,7 @@
             let now = new Date();
             history.unshift({ amount: pendingAmt, upi: upiId, date: now.toLocaleString() });
             cancelUPI(); updateUI();
-            tele.showAlert(`Bhai ₹${pendingAmt} ka withdraw Pending mein chala gaya hai!`);
+            tele.showAlert(`Bhai ₹${pendingAmt} ki request lag gayi hai! Tension na lo.`);
         }
 
         function showWithdrawOptions() { document.getElementById('upi-step-1').style.display='none'; document.getElementById('upi-step-2').style.display='block'; }
